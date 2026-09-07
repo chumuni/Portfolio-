@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Kelvin Noah — Mobile Portfolio</title>
+<!-- Tailwind CSS v3 with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            slateBg: '#0b1326',
+            accentCyan: '#5eead4',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+<style data-purpose="custom-styles">
+    body {
+      background-color: #0b1326;
+      color: #94a3b8;
+      font-family: 'Inter', sans-serif;
+    }
+    /* Custom scrollbar for horizontal skills cards if needed */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Ambient drifting mist animation */
+    @keyframes mist-drift {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.35;
+      }
+      50% {
+        transform: translate(-4%, 6%) scale(1.08);
+        opacity: 0.65;
+      }
+    }
+    .animate-mist-slow {
+      animation: mist-drift 14s ease-in-out infinite alternate;
+    }
+  </style>
+</head>
+<body class="bg-slateBg text-slate-400 antialiased selection:bg-accentCyan selection:text-slateBg">
+<!-- BEGIN: MobileHeader -->
+<header class="sticky top-0 z-50 bg-[#0b1326]/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex items-center justify-between" data-purpose="mobile-header">
+<div class="flex items-center space-x-2"><span class="text-sm font-bold text-white tracking-wider">KELVIN<span class="text-accentCyan">.</span></span></div>
+<!-- Hamburger Menu Button -->
+<div class="flex items-center space-x-3 text-slate-400"><a aria-label="GitHub" class="hover:text-accentCyan transition-colors" href="https://github.com/Linker756" rel="noopener noreferrer" target="_blank"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill-rule="evenodd"></path></svg></a><a aria-label="LinkedIn" class="hover:text-accentCyan transition-colors" href="https://www.linkedin.com/in/kelvin-noah-b4008a421/" rel="noopener noreferrer" target="_blank"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.25V10.9H6.46M7.86 6.5a1.5 1.5 0 0 0-1.5 1.5 1.5 1.5 0 0 0 1.5 1.5 1.5 1.5 0 0 0 1.5-1.5 1.5 1.5 0 0 0-1.5-1.5z"></path></svg></a><a aria-label="Instagram" class="hover:text-accentCyan transition-colors" href="https://www.instagram.com/mr._eek?stkn=MXIydXd3dmMyaTliaQ%3D%3D&amp;utm_source=qr" target="_blank" rel="noopener noreferrer"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" fill-rule="evenodd"></path></svg></a><a aria-label="Email" class="hover:text-accentCyan transition-colors" href="mailto:mollek869@gmail.com" title="Email Kelvin"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a></div><button aria-label="Toggle Menu" class="p-2 text-slate-300 hover:text-accentCyan focus:outline-none" id="menu-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</header>
+<!-- END: MobileHeader -->
+<!-- BEGIN: MobileNavDrawer -->
+<div class="fixed inset-0 z-40 bg-[#0b1326] bg-opacity-95 transform transition-transform duration-300 ease-in-out flex flex-col justify-center px-8 translate-x-full" id="mobile-menu">
+<button aria-label="Close Menu" class="absolute top-4 right-4 p-2 text-slate-300 hover:text-accentCyan" id="close-menu-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<nav class="flex flex-col space-y-6 text-xl font-medium">
+<a class="mobile-nav-link text-white hover:text-accentCyan transition-colors" href="#about">About</a>
+<a class="mobile-nav-link text-white hover:text-accentCyan transition-colors" href="#projects">Projects</a>
+<a class="mobile-nav-link text-white hover:text-accentCyan transition-colors" href="#skills">Skills</a>
+<a class="mobile-nav-link text-white hover:text-accentCyan transition-colors" href="#contact">Contact</a>
+<a class="mobile-nav-link text-white hover:text-accentCyan transition-colors" href="projects.html">Full Projects Archive</a>
+</nav>
+</div>
+<!-- END: MobileNavDrawer -->
+<!-- BEGIN: MainContent -->
+<main class="px-4 py-6 max-w-md mx-auto space-y-12">
+<!-- BEGIN: HeroSection -->
+<section class="relative space-y-4 overflow-hidden pb-4" data-purpose="hero-section" id="hero-section">
+<!-- Ambient Glowing Background Haze -->
+<div aria-hidden="true" class="pointer-events-none absolute -top-12 -left-10 w-72 h-72 rounded-full bg-accentCyan/10 blur-3xl animate-mist-slow"></div>
+<div aria-hidden="true" class="pointer-events-none absolute top-4 right-0 w-60 h-60 rounded-full bg-slate-700/20 blur-2xl"></div>
+<!-- Hero Content wrapper that gently fades on scroll -->
+<div class="relative z-10 space-y-4 transition-all duration-300 ease-out will-change-transform" id="hero-content" style="opacity: 1; transform: translateY(0px);">
+<!-- Role tags -->
+<div class="relative overflow-hidden w-full flex text-xs font-medium text-accentCyan py-1"><div class="animate-marquee-left flex space-x-2"><span class="bg-accentCyan/10 px-2.5 py-1 rounded-full border border-accentCyan/25 shrink-0">Software developer</span><span class="bg-accentCyan/10 px-2.5 py-1 rounded-full border border-accentCyan/25 shrink-0">App &amp; web design</span><span class="bg-accentCyan/10 px-2.5 py-1 rounded-full border border-accentCyan/25 shrink-0">Graphic design</span><span class="bg-accentCyan/10 px-2.5 py-1 rounded-full border border-accentCyan/25 shrink-0">UI/UX responsive</span><span class="bg-accentCyan/10 px-2.5 py-1 rounded-full border border-accentCyan/25 shrink-0">Software developer</span><span class="bg-accentCyan/10 px-2.5 py-1 rounded-full border border-accentCyan/25 shrink-0">App &amp; web design</span><span class="bg-accentCyan/10 px-2.5 py-1 rounded-full border border-accentCyan/25 shrink-0">Graphic design</span><span class="bg-accentCyan/10 px-2.5 py-1 rounded-full border border-accentCyan/25 shrink-0">UI/UX responsive</span></div></div>
+<p class="text-sm text-slate-300 leading-relaxed">
+        I'm a <strong class="text-white font-semibold">Software Developer specializing in Web &amp; App Development</strong>, passionate about creating modern, responsive, and user-focused digital experiences.
+      </p>
+</div>
+<!-- Cinematic Dark Fog/Mist Transition Layer -->
+<div aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 h-28 transition-opacity duration-300 ease-out z-20" id="hero-mist-overlay" style="background: radial-gradient(90% 65% at 50% 100%, rgba(11, 19, 38, 0.95) 0%, rgba(11, 19, 38, 0.75) 45%, rgba(94, 234, 212, 0.04) 75%, transparent 100%), linear-gradient(transparent 0%, rgba(11, 19, 38, 0.4) 40%, rgba(11, 19, 38, 0.85) 75%, rgb(11, 19, 38) 100%); backdrop-filter: blur(4px); opacity: 0.25;">
+</div>
+</section>
+<!-- END: HeroSection -->
+<!-- BEGIN: AboutSection -->
+<section class="space-y-4 pt-4 border-t border-slate-800" data-purpose="about-section" id="about">
+<h2 class="text-xs font-semibold tracking-wider text-accentCyan uppercase">About Me</h2>
+<div class="space-y-3 text-sm text-slate-300 leading-relaxed">
+<p class="">
+          Hi there! I'm Kelvin Mollel, and I enjoy turning ideas into digital experiences. I'm a software developer focused on building modern web applications and mobile experiences, with a strong interest in clean design, intuitive user interfaces, and reliable, scalable code.
+        </p>
+<p class="">
+          I enjoy working at the intersection of design and development&nbsp; taking an idea from an initial concept and transforming it into a functional, responsive, and user-friendly product.
+        </p>
+<div class="pt-2 text-center"><a class="inline-flex items-center space-x-1 text-sm font-medium text-white hover:text-accentCyan transition-colors" href="#"><span class="">VIEW FULL RÉSUMÉ</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a></div></div>
+</section><section class="space-y-4 pt-4 border-t border-slate-800" data-purpose="skills-section" id="skills"><div class="flex items-center justify-between"><h2 class="text-xs font-semibold tracking-wider text-accentCyan uppercase">Technical Stack</h2></div><h3 class="text-xl font-bold text-white mb-4">Skills &amp; Capabilities</h3><div class="space-y-4 overflow-hidden py-2 relative"><div class="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-[#0b1326] to-transparent z-20"></div><div class="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#0b1326] to-transparent z-20"></div><style>@keyframes marquee-left { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } } @keyframes marquee-right { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } } .animate-marquee-left { display: flex; width: max-content; animation: marquee-left 25s linear infinite; } .animate-marquee-right { display: flex; width: max-content; animation: marquee-right 25s linear infinite; } .animate-marquee-left:hover, .animate-marquee-right:hover { animation-play-state: paused; }</style><div class="relative overflow-hidden w-full flex"><div class="animate-marquee-left flex space-x-4"><div class="bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Creative &amp; UI</span><h4 class="text-sm font-bold mt-2">Web Design</h4></div><div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">CMS Platforms</span><h4 class="text-sm font-bold mt-2">WordPress</h4></div><div class="bg-gradient-to-br from-indigo-700 to-purple-800 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Development</span><h4 class="text-sm font-bold mt-2">CMS Development</h4></div><div class="bg-gradient-to-br from-red-600 to-rose-700 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Design</span><h4 class="text-sm font-bold mt-2">Graphic Design</h4></div><div class="bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Creative &amp; UI</span><h4 class="text-sm font-bold mt-2">UI/UX Design</h4></div><div class="bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Creative &amp; UI</span><h4 class="text-sm font-bold mt-2">Web Design</h4></div><div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">CMS Platforms</span><h4 class="text-sm font-bold mt-2">WordPress</h4></div><div class="bg-gradient-to-br from-indigo-700 to-purple-800 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Development</span><h4 class="text-sm font-bold mt-2">CMS Development</h4></div><div class="bg-gradient-to-br from-red-600 to-rose-700 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Design</span><h4 class="text-sm font-bold mt-2">Graphic Design</h4></div><div class="bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Creative &amp; UI</span><h4 class="text-sm font-bold mt-2">UI/UX Design</h4></div></div></div><div class="relative overflow-hidden w-full flex"><div class="animate-marquee-right flex space-x-4"><div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Frontend</span><h4 class="text-sm font-bold mt-2">Responsive Design</h4></div><div class="bg-gradient-to-br from-amber-600 to-orange-700 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Architecture</span><h4 class="text-sm font-bold mt-2">Software Architecture</h4></div><div class="bg-gradient-to-br from-blue-700 to-slate-800 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Security</span><h4 class="text-sm font-bold mt-2">Cybersecurity</h4></div><div class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">AI</span><h4 class="text-sm font-bold mt-2">AI Integration</h4></div><div class="bg-gradient-to-br from-red-700 to-rose-900 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Workflow</span><h4 class="text-sm font-bold mt-2">Git &amp; Version</h4></div><div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Frontend</span><h4 class="text-sm font-bold mt-2">Responsive Design</h4></div><div class="bg-gradient-to-br from-amber-600 to-orange-700 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Architecture</span><h4 class="text-sm font-bold mt-2">Software Architecture</h4></div><div class="bg-gradient-to-br from-blue-700 to-slate-800 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Security</span><h4 class="text-sm font-bold mt-2">Cybersecurity</h4></div><div class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">AI</span><h4 class="text-sm font-bold mt-2">AI Integration</h4></div><div class="bg-gradient-to-br from-red-700 to-rose-900 rounded-xl p-4 text-white shadow-lg shrink-0 w-48"><span class="text-[10px] tracking-wider uppercase font-semibold opacity-80">Workflow</span><h4 class="text-sm font-bold mt-2">Git &amp; Version</h4></div></div></div></div></section>
+<!-- END: AboutSection -->
+<!-- BEGIN: ProjectsSection -->
+<section class="space-y-6 pt-4 border-t border-slate-800" data-purpose="projects-section" id="projects">
+<h2 class="text-xs font-semibold tracking-wider text-accentCyan uppercase">Featured Projects</h2>
+<div class="space-y-4">
+<!-- Project Card 1 -->
+<article class="bg-slate-900/50 border border-slate-800 rounded-xl p-4 space-y-3 hover:border-accentCyan/50 transition-colors">
+<div class="flex items-center justify-between text-xs">
+<span class="text-accentCyan font-medium">LIVE &amp; DEPLOYED</span>
+<span class="text-slate-500">Web Development</span>
+</div>
+<div>
+<h3 class="text-base font-semibold text-white flex items-center space-x-1"><a class="flex items-center space-x-1 hover:text-accentCyan transition-colors" href="https://africa-safari.com/" rel="noopener noreferrer" target="_blank"><span class="">In and Out Safaris</span><svg class="w-3.5 h-3.5 text-accentCyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a></h3>
+<p class="text-xs text-slate-400 mt-1">A modern tourism website designed and developed for a safari and travel business.</p>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Web Design</span>
+<span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">UI/UX</span>
+<span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">JavaScript</span>
+</div>
+</article>
+<!-- Project Card 2 -->
+<article class="bg-slate-900/50 border border-slate-800 rounded-xl p-4 space-y-3 hover:border-accentCyan/50 transition-colors">
+<div class="flex items-center justify-between text-xs">
+<span class="text-accentCyan font-medium">LIVE &amp; DEPLOYED</span>
+<span class="text-slate-500">Web Development</span>
+</div>
+<div>
+<h3 class="text-base font-semibold text-white flex items-center space-x-1"><a class="flex items-center space-x-1 hover:text-accentCyan transition-colors" href="https://kibokolandadventures.com/" rel="noopener noreferrer" target="_blank"><span class="">Kiboko Land Adventure</span><svg class="w-3.5 h-3.5 text-accentCyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a></h3>
+<p class="text-xs text-slate-400 mt-1">A tourism and adventure website designed to provide visitors with an engaging way to explore travel experiences.</p>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Frontend</span>
+<span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">UI/UX</span>
+<span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">WordPress</span>
+</div>
+</article>
+<!-- Project Card 3 -->
+<article class="bg-slate-900/50 border border-slate-800 rounded-xl p-4 space-y-3 hover:border-accentCyan/50 transition-colors">
+<div class="flex items-center justify-between text-xs">
+<span class="text-amber-400 font-medium">IN DEVELOPMENT</span>
+<span class="text-slate-500">Artificial Intelligence</span>
+</div>
+<div>
+<h3 class="text-base font-semibold text-white flex items-center space-x-1">
+<span class="">Samaki Care.AI</span>
+<svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</h3>
+<p class="text-xs text-slate-400 mt-1">An AI-focused project exploring how technology can be used to support fish care and management.</p>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">AI</span>
+<span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Python</span>
+<span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">AI. Ttrainning&nbsp;</span>
+</div>
+</article>
+</div>
+<div class="pt-2 text-center"><a class="inline-flex items-center space-x-1 text-sm font-medium text-white hover:text-accentCyan transition-colors" href="projects.html"><span class="">VIEW ALL PROJECTS</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a></div></section>
+<!-- END: ProjectsSection -->
+<!-- BEGIN: ContactSection -->
+<section class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 space-y-4" data-purpose="contact-section" id="contact"><div><div class="inline-flex items-center space-x-1.5 text-accentCyan text-xs font-semibold tracking-wider uppercase mb-1"><span class="material-symbols-outlined text-sm">mail</span><span class="">Contact</span></div><h2 class="text-lg font-bold text-white">Get In Touch</h2><p class="text-xs text-slate-400 mt-1">Whether you have a question, a potential project in mind, or simply want to connect, feel free to reach out.</p></div><form class="space-y-4 pt-2"><div><label class="block text-xs font-medium text-slate-300 mb-1" for="name">Your Name</label><div class="relative"><input class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-accentCyan transition-colors" id="name" placeholder="John Doe" type="text"></div></div><div><label class="block text-xs font-medium text-slate-300 mb-1" for="email">Your Email</label><div class="relative"><input class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-accentCyan transition-colors" id="email" placeholder="john@example.com" type="email"></div></div><div><label class="block text-xs font-medium text-slate-300 mb-1" for="message">Your Message</label><textarea class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-accentCyan transition-colors" id="message" placeholder="Type your message here..." rows="3"></textarea></div><button class="w-full bg-accentCyan/10 hover:bg-accentCyan/20 text-accentCyan font-medium text-xs tracking-wider uppercase py-3 rounded-lg border border-accentCyan/30 flex items-center justify-center space-x-2 transition-colors" type="submit"><span class="">SEND MESSAGE</span><svg class="w-3.5 h-3.5 text-accentCyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button></form></section>
+<!-- END: ContactSection -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: Footer -->
+<footer class="text-center py-8 text-[11px] text-slate-500 border-t border-slate-900 mt-12 space-y-1 px-4" data-purpose="page-footer"><div class="inline-flex items-center space-x-2 text-xs text-slate-400"><span class="w-2 h-2 rounded-full bg-accentCyan animate-pulse"></span><span class="font-medium tracking-widest uppercase text-white">2026 kelvin noah all recerved.</span></div></footer>
+<!-- END: Footer -->
+<!-- BEGIN: InteractiveScript -->
+<script data-purpose="mobile-menu-toggle">
+    const menuBtn = document.getElementById('menu-btn');
+    const closeMenuBtn = document.getElementById('close-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+    function toggleMenu() {
+      const isOpen = mobileMenu.classList.contains('translate-x-0');
+      if (isOpen) {
+        mobileMenu.classList.remove('translate-x-0');
+        mobileMenu.classList.add('translate-x-full');
+      } else {
+        mobileMenu.classList.remove('translate-x-full');
+        mobileMenu.classList.add('translate-x-0');
+      }
+    }
+
+    menuBtn.addEventListener('click', toggleMenu);
+    closeMenuBtn.addEventListener('click', toggleMenu);
+
+    mobileNavLinks.forEach(link => {
+      link.addEventListener('click', toggleMenu);
+    });
+
+    // Cinematic scroll-driven fog & hero dissolution
+    const heroContent = document.getElementById('hero-content');
+    const heroMistOverlay = document.getElementById('hero-mist-overlay');
+    const heroSection = document.getElementById('hero-section');
+
+    function onScrollUpdate() {
+      if (!heroSection || !heroMistOverlay || !heroContent) return;
+      const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+      const heroHeight = heroSection.offsetHeight || 180;
+
+      // Calculate progress (0 at top, 1 when scrolled through hero)
+      const progress = Math.min(Math.max(scrollY / (heroHeight * 0.9), 0), 1);
+
+      // Interpolate opacity and slight upward translate for smoke dissipation
+      const contentOpacity = (1 - progress * 0.75).toFixed(3);
+      const translateY = -(progress * 14).toFixed(1);
+      heroContent.style.opacity = contentOpacity;
+      heroContent.style.transform = `translateY(${translateY}px)`;
+
+      // Intensify mist overlay and blur smoothly as you scroll down
+      const mistOpacity = Math.min(0.25 + progress * 0.75, 1).toFixed(3);
+      const blurAmount = (4 + progress * 8).toFixed(1);
+      heroMistOverlay.style.opacity = mistOpacity;
+      heroMistOverlay.style.backdropFilter = `blur(${blurAmount}px)`;
+      heroMistOverlay.style.webkitBackdropFilter = `blur(${blurAmount}px)`;
+    }
+
+    window.addEventListener('scroll', onScrollUpdate, { passive: true });
+    onScrollUpdate();
+  </script>
+<!-- END: InteractiveScript -->
+</body>
+</html>
