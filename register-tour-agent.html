@@ -93,8 +93,8 @@
         </a>
         <div class="hidden md:flex gap-md ml-lg">
           <a class="text-on-surface-variant hover:text-primary transition-colors text-sm hover:bg-surface-container-low transition-all px-3 py-2 rounded no-underline" href="index.html">Explore</a>
-          <a class="text-on-surface-variant hover:text-primary transition-colors text-sm hover:bg-surface-container-low transition-all px-3 py-2 rounded no-underline" href="#partnerships">Partnerships</a>
-          <a class="text-on-surface-variant hover:text-primary transition-colors text-sm hover:bg-surface-container-low transition-all px-3 py-2 rounded no-underline" href="#safety">Safety</a>
+          <a class="text-on-surface-variant hover:text-primary transition-colors text-sm hover:bg-surface-container-low transition-all px-3 py-2 rounded no-underline" href="index.html#features">Partnerships</a>
+          <a class="text-on-surface-variant hover:text-primary transition-colors text-sm hover:bg-surface-container-low transition-all px-3 py-2 rounded no-underline" href="index.html#about">Safety</a>
         </div>
       </div>
       <div class="flex items-center gap-sm">
@@ -160,11 +160,7 @@
             <div class="flex flex-col gap-xs">
               <label class="text-xs font-bold text-on-surface-variant" for="country">Country</label>
               <select class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="country">
-                <option>Select Country</option>
-                <option>United States</option>
-                <option>Kenya</option>
-                <option>Peru</option>
-                <option>Nepal</option>
+                <option value="">Select Country</option>
               </select>
             </div>
 
@@ -187,11 +183,13 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-sm">
             
             <div class="flex flex-col gap-xs">
-              <label class="text-xs font-bold text-on-surface-variant">CV/Resume</label>
-              <div class="border border-dashed border-outline-variant rounded p-2 text-center hover:bg-surface-container-low transition-colors cursor-pointer flex items-center justify-center gap-2">
+              <label class="text-xs font-bold text-on-surface-variant">CV/Resume or ID Document</label>
+              <input class="hidden" id="document" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+              <div id="documentDropzone" class="border border-dashed border-outline-variant rounded p-2 text-center hover:bg-surface-container-low transition-colors cursor-pointer flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined text-primary text-lg">upload_file</span>
-                <span class="text-xs text-on-surface-variant">Upload PDF/DOCX</span>
+                <span id="documentLabel" class="text-xs text-on-surface-variant">Upload PDF/DOC/DOCX (no images)</span>
               </div>
+              <p id="documentError" class="hidden text-xs text-error"></p>
             </div>
 
             <div class="flex flex-col gap-xs">
@@ -252,8 +250,8 @@
           <div class="flex items-start gap-2">
             <input class="mt-1 rounded text-primary focus:ring-primary border border-outline" id="termsConfirm" type="checkbox">
             <label class="text-xs text-on-surface-variant" for="termsConfirm">
-              I agree to <a class="text-primary hover:underline no-underline" href="#terms">Terms</a> &amp; 
-              <a class="text-primary hover:underline no-underline" href="#privacy">Privacy</a>.
+              I agree to <a class="text-primary hover:underline no-underline" href="legal.html#terms">Terms</a> &amp;
+              <a class="text-primary hover:underline no-underline" href="legal.html#privacy">Privacy</a>.
             </label>
           </div>
 
@@ -277,23 +275,54 @@
   <footer class="bg-surface-container-highest w-full px-margin-mobile md:px-margin-desktop py-lg flex flex-col md:flex-row justify-between items-center gap-md border-t border-outline-variant mt-auto">
     <div class="text-xs text-on-surface-variant">© 2026 Linker Adventure. Global Stewardship in Tourism.</div>
     <div class="flex flex-wrap justify-center gap-md">
-      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#terms">Terms of Service</a>
-      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#privacy">Privacy Policy</a>
-      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#cookies">Cookies</a>
-      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#support">Contact Support</a>
-      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#compliance">Global Trade Compliance</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="legal.html#terms">Terms of Service</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="legal.html#privacy">Privacy Policy</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="legal.html#cookies">Cookies</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="legal.html#support">Contact Support</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="legal.html#compliance">Global Trade Compliance</a>
     </div>
   </footer>
 
   <!-- Backend Integration Script -->
+  <script src="assets/js/api-config.js"></script>
+  <script src="assets/js/countries.js"></script>
   <script>
+    populateCountrySelect(document.getElementById('country'));
+
+    const EXPERIENCE_YEARS = { '0-2 yrs': 1, '3-5 yrs': 4, '5-10 yrs': 7, '10+ yrs': 12 };
+
+    // Document upload: click the styled dropzone to open the real file picker,
+    // and reject images client-side since this field is for a document (PDF/DOC/DOCX).
+    const documentInput = document.getElementById('document');
+    const documentDropzone = document.getElementById('documentDropzone');
+    const documentLabel = document.getElementById('documentLabel');
+    const documentError = document.getElementById('documentError');
+
+    documentDropzone.addEventListener('click', () => documentInput.click());
+
+    documentInput.addEventListener('change', () => {
+      const file = documentInput.files[0];
+      documentError.classList.add('hidden');
+      if (!file) return;
+
+      if (file.type.startsWith('image/')) {
+        documentInput.value = '';
+        documentError.textContent = 'Please upload a document (PDF or Word file), not an image.';
+        documentError.classList.remove('hidden');
+        documentLabel.textContent = 'Upload PDF/DOC/DOCX (no images)';
+        return;
+      }
+
+      documentLabel.textContent = file.name;
+    });
+
     document.getElementById('agentRegisterForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const formMessage = document.getElementById('formMessage');
       const submitBtn = e.target.querySelector('button[type="submit"]');
       const originalBtnHtml = submitBtn.innerHTML;
-      
+
       // Basic password validation
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('confirmPassword').value;
@@ -302,52 +331,58 @@
         formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
         return;
       }
-      
+
       // Update UI state
       submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Processing...';
       submitBtn.disabled = true;
       formMessage.className = "hidden";
-      
-      const data = {
-        firstName: document.getElementById('firstName').value,
-        lastName: document.getElementById('lastName').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('countryCode').value + document.getElementById('phone').value,
-        idNumber: document.getElementById('idNumber').value,
-        country: document.getElementById('country').value,
-        city: document.getElementById('city').value,
-        address: document.getElementById('address').value,
-        experience: document.getElementById('experience').value,
-        specialization: document.getElementById('specialization').value,
-        languages: document.getElementById('languages').value,
-        password: password
-      };
+
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const specialization = document.getElementById('specialization').value;
+      const experience = document.getElementById('experience').value;
+      const languages = document.getElementById('languages').value;
+
+      const formData = new FormData();
+      formData.append('email', document.getElementById('email').value);
+      formData.append('password', password);
+      formData.append('fullName', `${firstName} ${lastName}`.trim());
+      formData.append('phone', document.getElementById('countryCode').value + document.getElementById('phone').value);
+      formData.append('idNumber', document.getElementById('idNumber').value);
+      formData.append('country', document.getElementById('country').value);
+      formData.append('city', document.getElementById('city').value);
+      formData.append('address', document.getElementById('address').value);
+      if (EXPERIENCE_YEARS[experience]) formData.append('yearsExperience', EXPERIENCE_YEARS[experience]);
+      if (specialization && specialization !== 'Select') formData.append('specializations', specialization);
+      if (languages.trim()) formData.append('languages', languages);
+      if (documentInput.files[0]) formData.append('document', documentInput.files[0]);
 
       try {
-        const response = await fetch('http://localhost:5001/api/auth/register-agent', {
+        const response = await fetch(`${API_BASE}/auth/register/agent`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: formData
         });
 
         const result = await response.json();
 
-        if (response.ok) {
-          localStorage.setItem('token', result.token);
-          localStorage.setItem('userRole', result.role);
+        if (response.ok && result.success) {
+          localStorage.setItem('accessToken', result.data.tokens.accessToken);
+          localStorage.setItem('refreshToken', result.data.tokens.refreshToken);
+          localStorage.setItem('userRole', result.data.user.role);
           formMessage.textContent = "Registration successful! Redirecting...";
           formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-[#d1fae5] text-[#065f46] block";
           setTimeout(() => {
             window.location.href = 'signin.html';
           }, 2000);
         } else {
-          formMessage.textContent = result.message || "Registration failed. Please try again.";
+          const details = result.error?.details?.map((d) => d.message).join(' ');
+          formMessage.textContent = details || result.error?.message || "Registration failed. Please try again.";
           formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
           submitBtn.innerHTML = originalBtnHtml;
           submitBtn.disabled = false;
         }
       } catch (error) {
-        formMessage.textContent = "A network error occurred. Please try again.";
+        formMessage.textContent = "A network error occurred. Please check that the API server is running, then try again.";
         formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
         submitBtn.innerHTML = originalBtnHtml;
         submitBtn.disabled = false;

@@ -3,6 +3,7 @@ import * as userRepo from '../../repositories/user.repo.js';
 import * as profileRepo from '../../repositories/profile.repo.js';
 import { hashPassword, hashPasswordSync, verifyPassword } from '../../utils/password.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken, hashToken } from '../../utils/tokens.js';
+import { publicUploadPath } from '../../middleware/upload.js';
 import { conflict, unauthorized, badRequest } from '../../utils/AppError.js';
 
 function issueSession(user, userAgent) {
@@ -42,13 +43,15 @@ function register({ role, credentials, profileInput, userAgent }) {
   return { user: publicUser(user), profile, tokens: issueSession(user, userAgent) };
 }
 
-export function registerCompany(input, userAgent) {
+export function registerCompany(input, userAgent, file) {
   const { email, password, ...profileInput } = input;
+  if (file) profileInput.licenceUrl = publicUploadPath(file.filename);
   return register({ role: 'company', credentials: { email, password }, profileInput, userAgent });
 }
 
-export function registerAgent(input, userAgent) {
+export function registerAgent(input, userAgent, file) {
   const { email, password, ...profileInput } = input;
+  if (file) profileInput.cvUrl = publicUploadPath(file.filename);
   return register({ role: 'agent', credentials: { email, password }, profileInput, userAgent });
 }
 

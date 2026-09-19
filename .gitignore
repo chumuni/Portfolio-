@@ -16,6 +16,9 @@ jspm_packages/
 .env.test.local
 .env.production.local
 .env.*
+# ...but keep the checked-in templates that document required variables
+!.env.example
+!.env.sample
 
 # Editor directories and files
 .idea

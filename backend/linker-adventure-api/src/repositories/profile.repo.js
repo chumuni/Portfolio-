@@ -15,8 +15,12 @@ const mapCompany = (row) => row && ({
   city: row.city,
   website: row.website,
   phone: row.phone,
+  address: row.address,
+  managerName: row.manager_name,
+  operatorName: row.operator_name,
   logoUrl: row.logo_path,
   coverUrl: row.cover_path,
+  licenceUrl: row.license_path,
   tourTypes: parseList(row.tour_types),
   destinations: parseList(row.destinations),
   languages: parseList(row.languages),
@@ -41,6 +45,8 @@ const mapAgent = (row) => row && ({
   country: row.country,
   city: row.city,
   phone: row.phone,
+  idNumber: row.id_number,
+  address: row.address,
   photoUrl: row.photo_path,
   coverUrl: row.cover_path,
   cvUrl: row.cv_path,
@@ -66,9 +72,10 @@ export { mapCompany, mapAgent };
 export function createCompanyProfile(userId, input) {
   const id = query.insert(
     `INSERT INTO company_profiles
-       (user_id, company_name, slug, tagline, about, country, city, website, phone,
-        tour_types, destinations, languages, group_sizes, team_size, founded_year, license_number)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (user_id, company_name, slug, tagline, about, country, city, website, phone, address,
+        manager_name, operator_name, tour_types, destinations, languages, group_sizes,
+        team_size, founded_year, license_number, license_path)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       userId,
       input.companyName,
@@ -79,6 +86,9 @@ export function createCompanyProfile(userId, input) {
       input.city ?? null,
       input.website ?? null,
       input.phone ?? null,
+      input.address ?? null,
+      input.managerName ?? null,
+      input.operatorName ?? null,
       serialiseList(input.tourTypes),
       serialiseList(input.destinations),
       serialiseList(input.languages),
@@ -86,6 +96,7 @@ export function createCompanyProfile(userId, input) {
       input.teamSize ?? null,
       input.foundedYear ?? null,
       input.licenceNumber ?? null,
+      input.licenceUrl ?? null,
     ],
   );
   return findCompanyById(id);
@@ -94,10 +105,10 @@ export function createCompanyProfile(userId, input) {
 export function createAgentProfile(userId, input) {
   const id = query.insert(
     `INSERT INTO agent_profiles
-       (user_id, full_name, slug, headline, bio, country, city, phone,
+       (user_id, full_name, slug, headline, bio, country, city, phone, id_number, address,
         specializations, tour_types, languages, destinations,
-        years_experience, availability, remote_only, commission_rate)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        years_experience, availability, remote_only, commission_rate, cv_path)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       userId,
       input.fullName,
@@ -107,6 +118,8 @@ export function createAgentProfile(userId, input) {
       input.country ?? null,
       input.city ?? null,
       input.phone ?? null,
+      input.idNumber ?? null,
+      input.address ?? null,
       serialiseList(input.specializations),
       serialiseList(input.tourTypes),
       serialiseList(input.languages),
@@ -115,6 +128,7 @@ export function createAgentProfile(userId, input) {
       input.availability ?? 'available_now',
       fromBool(input.remoteOnly),
       input.commissionRate ?? null,
+      input.cvUrl ?? null,
     ],
   );
   return findAgentById(id);
@@ -150,6 +164,9 @@ const COMPANY_FIELDS = {
   city: 'city',
   website: 'website',
   phone: 'phone',
+  address: 'address',
+  managerName: 'manager_name',
+  operatorName: 'operator_name',
   teamSize: 'team_size',
   foundedYear: 'founded_year',
   licenceNumber: 'license_number',
@@ -170,6 +187,8 @@ const AGENT_FIELDS = {
   country: 'country',
   city: 'city',
   phone: 'phone',
+  idNumber: 'id_number',
+  address: 'address',
   yearsExperience: 'years_experience',
   availability: 'availability',
   remoteOnly: 'remote_only',

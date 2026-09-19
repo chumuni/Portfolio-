@@ -237,4 +237,15 @@ export const migrations = [
       CREATE INDEX idx_profile_views_subject ON profile_views(subject_type, subject_id, viewed_at);
     `,
   },
+  {
+    name: '006_registration_extra_fields',
+    sql: `
+      ALTER TABLE agent_profiles ADD COLUMN id_number TEXT;
+      ALTER TABLE agent_profiles ADD COLUMN address TEXT;
+
+      ALTER TABLE company_profiles ADD COLUMN manager_name TEXT;
+      ALTER TABLE company_profiles ADD COLUMN operator_name TEXT;
+      ALTER TABLE company_profiles ADD COLUMN address TEXT;
+    `,
+  },
 ];

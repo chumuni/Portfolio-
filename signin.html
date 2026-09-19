@@ -111,7 +111,7 @@
                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl7ioLO6zz7BrR-vOuqWO2Yk3NoOsFAIvaxeUa-eUPvVce_ZzNysJs9yDXdOOWwzIvf2VUOpkDE4KQ_EkhB4_EtSZ7tD_FUkcDT7ke6Xy5aLDIdM5nFSAeTbLr2qr5n6LlIUCAWG-pprIpbHeQwzR0D2hEJ02yEcXv84DUxGknZnpsgvjysk7h6SF7Z7hdqALTQh9M6y1D4VzDCTrhisORBlnGbcdN0YoRzFZXgonwgajHgWM5EU24yhlCkqsuLPCLYnDA3LgFIQo4" />
         </a>
       </div>
-      <a class="text-on-surface-variant font-label-md text-sm hover:text-primary transition-colors no-underline" href="#support">Help</a>
+      <a class="text-on-surface-variant font-label-md text-sm hover:text-primary transition-colors no-underline" href="legal.html#support">Help</a>
     </div>
   </header>
 
@@ -143,7 +143,7 @@
         <div class="space-y-xs">
           <div class="flex justify-between items-center">
             <label class="font-bold text-sm text-on-surface-variant" for="password">Password</label>
-            <a class="font-bold text-sm text-primary hover:underline no-underline" href="#forgot">Forgot Password?</a>
+            <a class="font-bold text-sm text-primary hover:underline no-underline" href="legal.html#support">Forgot Password?</a>
           </div>
           <div class="relative group">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px] group-focus-within:text-primary transition-colors">lock</span>
@@ -208,11 +208,11 @@
       <p class="text-sm text-on-surface-variant">© 2026 Linker Adventure. Global Stewardship in Tourism.</p>
     </div>
     <div class="flex flex-wrap justify-center md:justify-end gap-x-lg gap-y-sm">
-      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#terms">Terms of Service</a>
-      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#privacy">Privacy Policy</a>
-      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#cookies">Cookies</a>
-      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#support">Contact Support</a>
-      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#compliance">Global Trade Compliance</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="legal.html#terms">Terms of Service</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="legal.html#privacy">Privacy Policy</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="legal.html#cookies">Cookies</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="legal.html#support">Contact Support</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="legal.html#compliance">Global Trade Compliance</a>
     </div>
   </footer>
 
@@ -232,26 +232,27 @@
   </script>
 
   <!-- Backend Integration Script -->
+  <script src="assets/js/api-config.js"></script>
   <script>
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const formMessage = document.getElementById('formMessage');
       const submitBtn = e.target.querySelector('button[type="submit"]');
       const originalBtnHtml = submitBtn.innerHTML;
-      
+
       // Update UI state
       submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Signing In...';
       submitBtn.disabled = true;
       formMessage.className = "hidden";
-      
+
       const data = {
         email: document.getElementById('email').value,
         password: document.getElementById('password').value
       };
 
       try {
-        const response = await fetch('http://localhost:5001/api/auth/login', {
+        const response = await fetch(`${API_BASE}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
@@ -259,25 +260,27 @@
 
         const result = await response.json();
 
-        if (response.ok) {
+        if (response.ok && result.success) {
           formMessage.textContent = "Sign in successful!";
           formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-[#d1fae5] text-[#065f46] block";
-          
-          localStorage.setItem('token', result.token);
-          localStorage.setItem('userRole', result.role);
-          
+
+          localStorage.setItem('accessToken', result.data.tokens.accessToken);
+          localStorage.setItem('refreshToken', result.data.tokens.refreshToken);
+          localStorage.setItem('userRole', result.data.user.role);
+          localStorage.setItem('userEmail', result.data.user.email);
+
           setTimeout(() => {
             // Redirect based on role or to dashboard
-            window.location.href = 'index.html'; 
+            window.location.href = 'index.html';
           }, 1000);
         } else {
-          formMessage.textContent = result.message || "Invalid credentials.";
+          formMessage.textContent = result.error?.message || "Invalid credentials.";
           formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
           submitBtn.innerHTML = originalBtnHtml;
           submitBtn.disabled = false;
         }
       } catch (error) {
-        formMessage.textContent = "A network error occurred. Please try again.";
+        formMessage.textContent = "A network error occurred. Please check that the API server is running, then try again.";
         formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
         submitBtn.innerHTML = originalBtnHtml;
         submitBtn.disabled = false;

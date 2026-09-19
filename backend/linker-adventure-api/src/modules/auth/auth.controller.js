@@ -5,10 +5,10 @@ import { ok, created } from '../../utils/respond.js';
 const agent = (req) => req.get('user-agent') ?? null;
 
 export const registerCompany = asyncHandler(async (req, res) =>
-  created(res, authService.registerCompany(req.body, agent(req))));
+  created(res, authService.registerCompany(req.body, agent(req), req.file)));
 
 export const registerAgent = asyncHandler(async (req, res) =>
-  created(res, authService.registerAgent(req.body, agent(req))));
+  created(res, authService.registerAgent(req.body, agent(req), req.file)));
 
 export const login = asyncHandler(async (req, res) =>
   ok(res, await authService.login(req.body, agent(req))));

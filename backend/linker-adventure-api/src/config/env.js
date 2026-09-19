@@ -44,7 +44,11 @@ export const config = Object.freeze({
 
   security: {
     bcryptRounds: int('BCRYPT_ROUNDS', 12),
-    corsOrigins: list('CORS_ORIGINS', ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5500', 'http://127.0.0.1:5500']),
+    corsOrigins: list('CORS_ORIGINS', [
+      'http://localhost:5173', 'http://localhost:3000',
+      'http://localhost:5500', 'http://127.0.0.1:5500',
+      'http://localhost:5501', 'http://127.0.0.1:5501',
+    ]),
     rateLimitWindowMs: int('RATE_LIMIT_WINDOW_MINUTES', 15) * 60 * 1000,
     rateLimitMax: int('RATE_LIMIT_MAX', 300),
     authRateLimitMax: int('AUTH_RATE_LIMIT_MAX', 20),
@@ -58,6 +62,8 @@ export const config = Object.freeze({
       'image/png',
       'image/webp',
       'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     ],
   },
 });

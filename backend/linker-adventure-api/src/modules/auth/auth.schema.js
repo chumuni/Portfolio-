@@ -9,7 +9,17 @@ const password = z.string()
   .regex(/[A-Z]/, 'Password must contain an uppercase letter')
   .regex(/[0-9]/, 'Password must contain a number');
 
-const list = z.array(z.string().trim().min(1)).max(25).optional();
+/**
+ * Accepts a real array (JSON callers) or a comma-separated string (multipart
+ * form submissions, where every field arrives as text).
+ */
+const list = z.preprocess((value) => {
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'string' && value.trim()) {
+    return value.split(',').map((item) => item.trim()).filter(Boolean);
+  }
+  return undefined;
+}, z.array(z.string().trim().min(1)).max(25).optional());
 
 export const registerCompanySchema = z.object({
   email,
@@ -28,6 +38,9 @@ export const registerCompanySchema = z.object({
   teamSize: z.coerce.number().int().positive().max(100000).optional(),
   foundedYear: z.coerce.number().int().min(1800).max(new Date().getFullYear()).optional(),
   licenceNumber: z.string().trim().max(80).optional(),
+  managerName: z.string().trim().max(120).optional(),
+  operatorName: z.string().trim().max(120).optional(),
+  address: z.string().trim().max(255).optional(),
 });
 
 export const registerAgentSchema = z.object({
@@ -39,6 +52,8 @@ export const registerAgentSchema = z.object({
   country: z.string().trim().max(80).optional(),
   city: z.string().trim().max(80).optional(),
   phone: z.string().trim().max(40).optional(),
+  idNumber: z.string().trim().max(60).optional(),
+  address: z.string().trim().max(255).optional(),
   specializations: list,
   tourTypes: list,
   languages: list,

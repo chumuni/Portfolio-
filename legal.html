@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Legal &amp; Support - Linker Adventure</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#421e04",
+            "primary-container": "#5c3317",
+            "on-primary": "#ffffff",
+            secondary: "#52606c",
+            background: "#fff8f5",
+            surface: "#fff8f5",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#fdf1ec",
+            "surface-container": "#f7ece7",
+            "surface-container-highest": "#ebe0db",
+            "on-surface": "#201b18",
+            "on-surface-variant": "#51443d",
+            "outline-variant": "#d6c3b9",
+            "outline": "#84746c"
+          },
+          spacing: {
+            xs: "4px", sm: "12px", base: "8px", md: "24px", lg: "48px", xl: "80px",
+            "margin-mobile": "16px", "margin-desktop": "64px", gutter: "24px"
+          },
+          fontFamily: { display: ["Montserrat"], body: ["Inter"] }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-background text-on-background font-body antialiased min-h-screen flex flex-col">
+
+  <!-- TopNavBar -->
+  <nav class="bg-surface shadow-sm sticky top-0 z-50">
+    <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-[1440px] mx-auto">
+      <a class="font-bold text-lg text-primary no-underline" href="index.html">Linker Adventure</a>
+      <a class="text-sm text-primary border border-primary px-4 py-2 rounded hover:bg-surface-container-low transition-colors no-underline" href="index.html">Back Home</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-grow px-margin-mobile md:px-margin-desktop py-lg">
+    <div class="max-w-3xl mx-auto space-y-lg">
+
+      <section id="terms" class="scroll-mt-24 bg-surface-container-lowest rounded-xl border border-outline-variant p-md">
+        <h2 class="font-bold text-xl text-primary mb-2">Terms of Service</h2>
+        <p class="text-sm text-on-surface-variant">
+          By creating an account on Linker Adventure you agree to use the platform honestly:
+          the information and documents you submit for verification (business licences, IDs,
+          CVs) must be accurate and belong to you or your company. Misuse of the platform,
+          including fraudulent registrations, may result in account suspension.
+        </p>
+      </section>
+
+      <section id="privacy" class="scroll-mt-24 bg-surface-container-lowest rounded-xl border border-outline-variant p-md">
+        <h2 class="font-bold text-xl text-primary mb-2">Privacy Policy</h2>
+        <p class="text-sm text-on-surface-variant">
+          We store the account and profile details you provide (contact info, country, uploaded
+          verification documents) in order to operate the matchmaking platform between tour
+          companies and tour agents. Uploaded documents are stored privately and are only used
+          for verification.
+        </p>
+      </section>
+
+      <section id="cookies" class="scroll-mt-24 bg-surface-container-lowest rounded-xl border border-outline-variant p-md">
+        <h2 class="font-bold text-xl text-primary mb-2">Cookies</h2>
+        <p class="text-sm text-on-surface-variant">
+          Linker Adventure uses local browser storage to keep you signed in between visits.
+          We don't use third-party advertising cookies.
+        </p>
+      </section>
+
+      <section id="support" class="scroll-mt-24 bg-surface-container-lowest rounded-xl border border-outline-variant p-md">
+        <h2 class="font-bold text-xl text-primary mb-2">Contact Support</h2>
+        <p class="text-sm text-on-surface-variant">
+          Having trouble signing in, registering, or uploading a document? Email
+          <a class="text-primary hover:underline no-underline" href="mailto:support@linkeradventure.example">support@linkeradventure.example</a>
+          and describe the issue — including which page and what error message you saw.
+        </p>
+      </section>
+
+      <section id="compliance" class="scroll-mt-24 bg-surface-container-lowest rounded-xl border border-outline-variant p-md">
+        <h2 class="font-bold text-xl text-primary mb-2">Global Trade Compliance</h2>
+        <p class="text-sm text-on-surface-variant">
+          Tour companies and agents registering from any of our supported countries are
+          expected to comply with local tourism licensing regulations. Verification review
+          may request additional documentation where required by local law.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface-container-highest w-full px-margin-mobile md:px-margin-desktop py-lg flex flex-col md:flex-row justify-between items-center gap-md border-t border-outline-variant mt-auto">
+    <div class="text-xs text-on-surface-variant">© 2026 Linker Adventure. Global Stewardship in Tourism.</div>
+    <a class="text-sm text-primary hover:underline no-underline" href="index.html">Return to Home</a>
+  </footer>
+
+</body>
+</html>
