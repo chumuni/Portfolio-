@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Linker Adventure - Connect Tour Companies with Professional Agents</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#421e04",
+            "primary-container": "#5c3317",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#d69b77",
+            secondary: "#52606c",
+            "secondary-container": "#d5e4f3",
+            "on-secondary": "#ffffff",
+            tertiary: "#002d31",
+            "tertiary-container": "#00454a",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#7cb2b7",
+            background: "#fff8f5",
+            surface: "#fff8f5",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#fdf1ec",
+            "surface-container": "#f7ece7",
+            "surface-container-high": "#f1e6e1",
+            "surface-container-highest": "#ebe0db",
+            "on-surface": "#201b18",
+            "on-surface-variant": "#51443d",
+            "outline-variant": "#d6c3b9",
+            "outline": "#84746c"
+          },
+          spacing: {
+            xs: "4px",
+            sm: "12px",
+            base: "8px",
+            md: "24px",
+            lg: "48px",
+            xl: "80px",
+            "margin-mobile": "16px",
+            "margin-desktop": "64px",
+            gutter: "24px"
+          },
+          fontFamily: {
+            display: ["Montserrat"],
+            body: ["Inter"]
+          },
+          fontSize: {
+            "display-lg": ["48px", { lineHeight: "56px", fontWeight: "700", letterSpacing: "-0.02em" }],
+            "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "600" }],
+            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "label-md": ["14px", { lineHeight: "16px", fontWeight: "600", letterSpacing: "0.05em" }]
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 4px 24px rgba(92, 51, 23, 0.08);
+    }
+    
+    .nav-link-active {
+      color: #421e04;
+      background-color: #fdf1ec;
+    }
+  </style>
+</head>
+
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body">
+
+  <!-- Navigation -->
+  <header class="shadow-sm bg-surface w-full z-50 sticky top-0">
+    <nav class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto py-sm">
+      <div class="flex items-center gap-sm">
+        <a href="index.html" class="flex items-center gap-2 no-underline">
+          <img alt="Linker Adventure Logo" class="h-16 w-16 object-contain rounded-full border border-outline-variant" 
+               src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbEdTh34p5502k6RAMbFCbBPMEiWn9iETs3J__IECLurWbzRC9NbWsTWgN3vX0rWhgb-uuYJU2LJElwXXT0gCpwGbk0CnEsTLCLF7Bzq9v5hUxyzYB8glgWbe_7YzOn2U1MGAo1FNLTD7DGEo_Cfu3fC9jBGLbPnypl2qa9_ymLF0w0h_PgyPoormAhltcsoA79FiQ7utAlA8t92ZtfnaucnNcMItglFfJnYQIgMx1-9Ky7IkXy9tiIeFuq0WdwEnp28OO7It0XFHV" />
+        </a>
+      </div>
+
+      <!-- Desktop Navigation Links -->
+      <div class="hidden md:flex gap-md items-center">
+        <a href="index.html" class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md hover:bg-surface-container-low px-3 py-2 rounded-md nav-link-active">Home</a>
+        <a href="#features" class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md hover:bg-surface-container-low px-3 py-2 rounded-md">Features</a>
+        <a href="#about" class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md hover:bg-surface-container-low px-3 py-2 rounded-md">About</a>
+        <a href="#contact" class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md hover:bg-surface-container-low px-3 py-2 rounded-md">Contact</a>
+      </div>
+
+      <!-- Auth Buttons -->
+      <div class="flex items-center gap-sm">
+        <a href="signin.html" class="hidden md:block font-label-md text-label-md text-primary hover:bg-surface-container-low px-4 py-2 rounded-md transition-all">Sign In</a>
+        <a href="register-tour-agent.html" class="font-label-md text-label-md bg-primary text-on-primary px-4 py-2 rounded-md hover:bg-primary-container transition-all shadow-sm">Get Started</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex items-center justify-center relative overflow-hidden px-margin-mobile md:px-margin-desktop py-lg md:py-xl">
+    
+    <!-- Abstract Background Elements -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 opacity-40">
+      <div class="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-tertiary-fixed blur-3xl opacity-60"></div>
+      <div class="absolute bottom-[-10%] left-[-5%] w-[50vw] h-[50vw] rounded-full bg-surface-container-high blur-3xl opacity-70"></div>
+    </div>
+
+    <div class="max-w-[1440px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
+      
+      <!-- Hero Text Content -->
+      <div class="lg:col-span-6 flex flex-col gap-md z-10">
+        <h1 class="font-display-lg text-display-lg text-on-surface text-center md:text-left">
+          Welcome to <span class="text-primary">Linker Adventure</span>
+        </h1>
+        
+        <p class="font-headline-md text-headline-md text-secondary text-center md:text-left">
+          Connecting Tour Companies with Professional Tour Agents Across the World.
+        </p>
+        
+        <p class="font-body-lg text-body-lg text-on-surface-variant text-center md:text-left max-w-2xl mt-sm">
+          Join our growing tourism network. Whether you are a registered tour company looking for agents or an experienced tour agent seeking opportunities, Linker Adventure is the perfect platform for you.
+        </p>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-sm mt-md w-full sm:w-auto self-center md:self-start">
+          <a href="register-tour-company.html" class="flex items-center justify-center gap-sm px-lg py-sm bg-tertiary-container text-on-tertiary hover:bg-tertiary rounded-lg shadow-md transition-transform hover:-translate-y-1 font-label-md text-label-md w-full sm:w-auto no-underline">
+            <span class="material-symbols-outlined" style='font-variation-settings: "FILL" 1;'>business_center</span>
+            Join as a Tour Company
+          </a>
+          
+          <a href="register-tour-agent.html" class="flex items-center justify-center gap-sm px-lg py-sm bg-primary text-on-primary hover:bg-primary-container rounded-lg shadow-md transition-transform hover:-translate-y-1 font-label-md text-label-md w-full sm:w-auto no-underline">
+            <span class="material-symbols-outlined" style='font-variation-settings: "FILL" 1;'>person_search</span>
+            Join as a Tour Agent
+          </a>
+        </div>
+
+        <!-- Sign In Prompt -->
+        <div class="mt-lg text-center md:text-left p-sm glass-card rounded-xl inline-block self-center md:self-start w-full sm:w-auto">
+          <p class="font-body-sm text-body-sm text-on-surface-variant">
+            Already have an account? 
+            <a class="font-label-md text-label-md text-primary hover:underline ml-xs no-underline" href="signin.html">Sign In</a>
+            <span class="mx-xs">or</span>
+            <a class="font-label-md text-label-md text-primary hover:underline no-underline" href="register-tour-agent.html">Create Account</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Hero Visual -->
+      <div class="lg:col-span-6 relative h-[400px] md:h-[600px] w-full hidden md:block">
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 rounded-2xl overflow-hidden shadow-2xl z-10 border-4 border-surface">
+          <img alt="Global network map showing connections across continents" class="w-full h-full object-cover" 
+               src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsnFml3IKkOCXs6uvDzTk87kZKZgQifIsy7WMcCpfp1hVLlPh1QAhvISB503jczjHQSQJUAfscT02HiibfiCJw1FXk-Eb9-xYaBMJfutzvKZJa4D4WLsNlCpFGgYQTkMUvNduoMBsfeurpv1o5tGIJBnpYCLS9JkXx96iV2C1m4mZ6ikpvgR3HcBUnlHqyDEiLSzkYrBW-AwZP9v-TbS1Apt6KU7-JFX7Bn8FMKZpgPAz5DXh5hGK8KCPctMeabAOYmcfEnOq3aGI7" />
+        </div>
+
+        <!-- Floating Elements -->
+        <div class="absolute top-10 right-10 glass-card p-sm rounded-xl flex items-center gap-sm z-20 animate-bounce" style="animation-duration: 3s;">
+          <div class="w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary">
+            <span class="material-symbols-outlined">handshake</span>
+          </div>
+          <div>
+            <p class="font-label-md text-label-md text-on-surface">New Partnership</p>
+            <p class="font-body-sm text-body-sm text-secondary">Global Tours Inc.</p>
+          </div>
+        </div>
+
+        <div class="absolute bottom-20 left-0 glass-card p-sm rounded-xl flex items-center gap-sm z-20 shadow-lg" style="animation: bounce 4s infinite;">
+          <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary">
+            <span class="material-symbols-outlined">explore</span>
+          </div>
+          <div>
+            <p class="font-label-md text-label-md text-on-surface">Agent Matched</p>
+            <p class="font-body-sm text-body-sm text-secondary">Local Expert in Alps</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface-container-highest border-t border-outline-variant mt-auto">
+    <div class="w-full px-margin-mobile md:px-margin-desktop py-lg flex flex-col md:flex-row justify-between items-center gap-md max-w-[1440px] mx-auto">
+      <div class="flex flex-col items-center md:items-start gap-xs">
+        <span class="font-headline-md text-headline-md font-bold text-on-surface">Linker Adventure</span>
+        <p class="font-body-sm text-body-sm text-primary">© 2026 Linker Adventure. Global Stewardship in Tourism.</p>
+      </div>
+      <div class="flex flex-wrap justify-center gap-sm md:gap-md">
+        <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors opacity-90 hover:opacity-100 no-underline" href="#terms">Terms of Service</a>
+        <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors opacity-90 hover:opacity-100 no-underline" href="#privacy">Privacy Policy</a>
+        <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors opacity-90 hover:opacity-100 no-underline" href="#cookies">Cookies</a>
+        <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors opacity-90 hover:opacity-100 no-underline" href="#support">Contact Support</a>
+        <a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors opacity-90 hover:opacity-100 no-underline" href="#compliance">Global Trade Compliance</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

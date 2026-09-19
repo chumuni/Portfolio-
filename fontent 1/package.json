@@ -1,0 +1,29 @@
+{
+  "name": "adventure",
+  "version": "1.0.0",
+  "description": "I've organized and improved your Linker Adventure website with **proper page linking, consistent navigation, and professional structure**. All your pages now work together seamlessly as a cohesive platform.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Linker756/Adventure.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Linker756/Adventure/issues"
+  },
+  "homepage": "https://github.com/Linker756/Adventure#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.7.3"
+  }
+}

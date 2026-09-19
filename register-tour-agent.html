@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Linker Adventure - Register as a Tour Agent</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#421e04",
+            "primary-container": "#5c3317",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#d69b77",
+            "on-primary-fixed": "#321300",
+            "on-primary-fixed-variant": "#673c1f",
+            secondary: "#52606c",
+            "secondary-container": "#d5e4f3",
+            "secondary-fixed": "#d5e4f3",
+            "secondary-fixed-dim": "#b9c8d7",
+            "on-secondary": "#ffffff",
+            "on-secondary-fixed": "#0f1d28",
+            "on-secondary-container": "#586673",
+            "on-secondary-fixed-variant": "#3a4854",
+            tertiary: "#002d31",
+            "tertiary-container": "#00454a",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#7cb2b7",
+            "tertiary-fixed": "#b5ecf2",
+            "tertiary-fixed-dim": "#99d0d6",
+            background: "#fff8f5",
+            surface: "#fff8f5",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#fdf1ec",
+            "surface-container": "#f7ece7",
+            "surface-container-high": "#f1e6e1",
+            "surface-container-highest": "#ebe0db",
+            "on-surface": "#201b18",
+            "on-surface-variant": "#51443d",
+            "on-background": "#201b18",
+            "outline-variant": "#d6c3b9",
+            "outline": "#84746c",
+            error: "#ba1a1a",
+            "on-error": "#ffffff"
+          },
+          spacing: {
+            xs: "4px",
+            sm: "12px",
+            base: "8px",
+            md: "24px",
+            lg: "48px",
+            xl: "80px",
+            "margin-mobile": "16px",
+            "margin-desktop": "64px",
+            gutter: "24px"
+          },
+          fontFamily: {
+            display: ["Montserrat"],
+            body: ["Inter"]
+          },
+          fontSize: {
+            "label-md": ["14px", { lineHeight: "16px", fontWeight: "600", letterSpacing: "0.05em" }],
+            "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "600" }]
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+
+<body class="bg-background text-on-background font-body antialiased min-h-screen flex flex-col">
+  
+  <!-- TopNavBar -->
+  <nav class="bg-surface shadow-sm sticky top-0 z-50">
+    <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-[1440px] mx-auto">
+      <div class="flex items-center gap-md">
+        <a class="font-bold text-lg text-primary flex items-center gap-2 no-underline" href="index.html">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbEdTh34p5502k6RAMbFCbBPMEiWn9iETs3J__IECLurWbzRC9NbWsTWgN3vX0rWhgb-uuYJU2LJElwXXT0gCpwGbk0CnEsTLCLF7Bzq9v5hUxyzYB8glgWbe_7YzOn2U1MGAo1FNLTD7DGEo_Cfu3fC9jBGLbPnypl2qa9_ymLF0w0h_PgyPoormAhltcsoA79FiQ7utAlA8t92ZtfnaucnNcMItglFfJnYQIgMx1-9Ky7IkXy9tiIeFuq0WdwEnp28OO7It0XFHV" alt="Linker Adventure Logo" class="h-12 w-auto">
+        </a>
+        <div class="hidden md:flex gap-md ml-lg">
+          <a class="text-on-surface-variant hover:text-primary transition-colors text-sm hover:bg-surface-container-low transition-all px-3 py-2 rounded no-underline" href="index.html">Explore</a>
+          <a class="text-on-surface-variant hover:text-primary transition-colors text-sm hover:bg-surface-container-low transition-all px-3 py-2 rounded no-underline" href="#partnerships">Partnerships</a>
+          <a class="text-on-surface-variant hover:text-primary transition-colors text-sm hover:bg-surface-container-low transition-all px-3 py-2 rounded no-underline" href="#safety">Safety</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-sm">
+        <a class="text-sm text-primary border border-primary px-4 py-2 rounded hover:bg-surface-container-low transition-colors hidden md:block no-underline" href="signin.html">Sign In</a>
+        <a class="text-sm bg-primary text-on-primary px-4 py-2 rounded hover:bg-primary-container transition-colors no-underline" href="register-tour-agent.html">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex items-center justify-center px-margin-mobile md:px-margin-desktop py-md">
+    <div class="w-full max-w-3xl bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_4px_12px_rgba(92,51,23,0.05)] overflow-hidden">
+      
+      <!-- Header Section -->
+      <div class="bg-surface-container px-md border-b border-outline-variant text-center py-md">
+        <span class="material-symbols-outlined text-4xl text-primary mb-2">assignment_ind</span>
+        <h1 class="font-bold text-2xl md:text-3xl text-on-surface">Register as a Tour Agent</h1>
+        <p class="text-sm text-on-surface-variant mt-2">Join our network of global stewardship and lead unforgettable adventures.</p>
+      </div>
+
+      <form id="agentRegisterForm" class="p-md space-y-sm md:p-md">
+        <div id="formMessage" class="hidden text-center py-3 px-4 font-bold text-sm"></div>
+        
+        <!-- Section 1: Personal Information -->
+        <section>
+          <h2 class="text-sm font-bold text-primary mb-sm border-b border-surface-container-high pb-1">Personal Information</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-sm">
+            
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-bold text-on-surface-variant" for="firstName">First Name</label>
+              <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="firstName" type="text">
+            </div>
+
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-bold text-on-surface-variant" for="lastName">Last Name</label>
+              <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="lastName" type="text">
+            </div>
+
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-bold text-on-surface-variant" for="email">Email Address</label>
+              <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="email" type="email">
+            </div>
+
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-bold text-on-surface-variant" for="phone">Phone Number</label>
+              <div class="flex gap-2">
+                <select class="w-24 rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-2 text-sm border border-outline" id="countryCode">
+                  <option value="+1">+1</option>
+                  <option value="+44">+44</option>
+                  <option value="+254">+254</option>
+                  <option value="+51">+51</option>
+                  <option value="+977">+977</option>
+                </select>
+                <input class="flex-grow rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="phone" type="tel" placeholder="000-000-000">
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-bold text-on-surface-variant" for="idNumber">ID/Passport</label>
+              <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="idNumber" type="text">
+            </div>
+
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-bold text-on-surface-variant" for="country">Country</label>
+              <select class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="country">
+                <option>Select Country</option>
+                <option>United States</option>
+                <option>Kenya</option>
+                <option>Peru</option>
+                <option>Nepal</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-bold text-on-surface-variant" for="city">City</label>
+              <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="city" type="text">
+            </div>
+
+            <div class="flex flex-col gap-xs md:col-span-2">
+              <label class="text-xs font-bold text-on-surface-variant" for="address">Residential Address</label>
+              <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="address" type="text">
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Section 2: Professional Information -->
+        <section>
+          <h2 class="text-sm font-bold text-primary mb-sm border-b border-surface-container-high pb-1">Professional Information</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-sm">
+            
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-bold text-on-surface-variant">CV/Resume</label>
+              <div class="border border-dashed border-outline-variant rounded p-2 text-center hover:bg-surface-container-low transition-colors cursor-pointer flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-primary text-lg">upload_file</span>
+                <span class="text-xs text-on-surface-variant">Upload PDF/DOCX</span>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-bold text-on-surface-variant" for="experience">Experience</label>
+              <select class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="experience">
+                <option>Select</option>
+                <option>0-2 yrs</option>
+                <option>3-5 yrs</option>
+                <option>5-10 yrs</option>
+                <option>10+ yrs</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-bold text-on-surface-variant" for="specialization">Specialization</label>
+              <select class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="specialization">
+                <option>Select</option>
+                <option>Safari</option>
+                <option>Trekking</option>
+                <option>Cultural</option>
+                <option>Water</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-xs md:col-span-3">
+              <label class="text-xs font-bold text-on-surface-variant" for="languages">Languages Spoken</label>
+              <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="languages" type="text" placeholder="e.g., English, Swahili, French">
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Section 3: Account Security -->
+        <section>
+          <h2 class="text-sm font-bold text-primary mb-sm border-b border-surface-container-high pb-1">Account Security</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+            
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-bold text-on-surface-variant" for="password">Password</label>
+              <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="password" type="password">
+            </div>
+
+            <div class="flex flex-col gap-xs">
+              <label class="text-xs font-bold text-on-surface-variant" for="confirmPassword">Confirm Password</label>
+              <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="confirmPassword" type="password">
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Agreements & Submit -->
+        <div class="space-y-sm pt-sm border-t border-surface-container-high">
+          <div class="flex items-start gap-2">
+            <input class="mt-1 rounded text-primary focus:ring-primary border border-outline" id="infoConfirm" type="checkbox">
+            <label class="text-xs text-on-surface-variant" for="infoConfirm">I confirm information is accurate.</label>
+          </div>
+
+          <div class="flex items-start gap-2">
+            <input class="mt-1 rounded text-primary focus:ring-primary border border-outline" id="termsConfirm" type="checkbox">
+            <label class="text-xs text-on-surface-variant" for="termsConfirm">
+              I agree to <a class="text-primary hover:underline no-underline" href="#terms">Terms</a> &amp; 
+              <a class="text-primary hover:underline no-underline" href="#privacy">Privacy</a>.
+            </label>
+          </div>
+
+          <button class="w-full bg-[#f97316] hover:bg-[#ea580c] text-white font-bold text-sm py-2 px-4 rounded shadow transition-colors flex justify-center items-center gap-2" type="submit">
+            Create Account <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </button>
+
+          <div class="text-center mt-2">
+            <p class="text-xs text-on-surface-variant">
+              Already have an account? 
+              <a class="text-primary font-bold hover:underline no-underline" href="signin.html">Sign In</a>
+            </p>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface-container-highest w-full px-margin-mobile md:px-margin-desktop py-lg flex flex-col md:flex-row justify-between items-center gap-md border-t border-outline-variant mt-auto">
+    <div class="text-xs text-on-surface-variant">© 2026 Linker Adventure. Global Stewardship in Tourism.</div>
+    <div class="flex flex-wrap justify-center gap-md">
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#terms">Terms of Service</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#privacy">Privacy Policy</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#cookies">Cookies</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#support">Contact Support</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#compliance">Global Trade Compliance</a>
+    </div>
+  </footer>
+
+  <!-- Backend Integration Script -->
+  <script>
+    document.getElementById('agentRegisterForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formMessage = document.getElementById('formMessage');
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalBtnHtml = submitBtn.innerHTML;
+      
+      // Basic password validation
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      if (password !== confirmPassword) {
+        formMessage.textContent = "Passwords do not match.";
+        formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
+        return;
+      }
+      
+      // Update UI state
+      submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Processing...';
+      submitBtn.disabled = true;
+      formMessage.className = "hidden";
+      
+      const data = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('countryCode').value + document.getElementById('phone').value,
+        idNumber: document.getElementById('idNumber').value,
+        country: document.getElementById('country').value,
+        city: document.getElementById('city').value,
+        address: document.getElementById('address').value,
+        experience: document.getElementById('experience').value,
+        specialization: document.getElementById('specialization').value,
+        languages: document.getElementById('languages').value,
+        password: password
+      };
+
+      try {
+        const response = await fetch('http://localhost:5001/api/auth/register-agent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('token', result.token);
+          localStorage.setItem('userRole', result.role);
+          formMessage.textContent = "Registration successful! Redirecting...";
+          formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-[#d1fae5] text-[#065f46] block";
+          setTimeout(() => {
+            window.location.href = 'signin.html';
+          }, 2000);
+        } else {
+          formMessage.textContent = result.message || "Registration failed. Please try again.";
+          formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
+          submitBtn.innerHTML = originalBtnHtml;
+          submitBtn.disabled = false;
+        }
+      } catch (error) {
+        formMessage.textContent = "A network error occurred. Please try again.";
+        formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
+        submitBtn.innerHTML = originalBtnHtml;
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

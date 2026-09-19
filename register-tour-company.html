@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Register Your Tour Company - Linker Adventure</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#421e04",
+            "primary-container": "#5c3317",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#d69b77",
+            secondary: "#52606c",
+            "secondary-container": "#d5e4f3",
+            "on-secondary": "#ffffff",
+            tertiary: "#002d31",
+            "tertiary-container": "#00454a",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#7cb2b7",
+            background: "#fff8f5",
+            surface: "#fff8f5",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#fdf1ec",
+            "surface-container": "#f7ece7",
+            "surface-container-high": "#f1e6e1",
+            "surface-container-highest": "#ebe0db",
+            "on-surface": "#201b18",
+            "on-surface-variant": "#51443d",
+            "outline-variant": "#d6c3b9",
+            "outline": "#84746c"
+          },
+          spacing: {
+            xs: "4px",
+            sm: "12px",
+            base: "8px",
+            md: "24px",
+            lg: "48px",
+            xl: "80px",
+            "margin-mobile": "16px",
+            "margin-desktop": "64px",
+            gutter: "24px"
+          },
+          fontFamily: {
+            display: ["Montserrat"],
+            body: ["Inter"]
+          },
+          fontSize: {
+            "label-md": ["14px", { lineHeight: "16px", fontWeight: "600", letterSpacing: "0.05em" }],
+            "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "600" }]
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+</head>
+
+<body class="bg-background text-on-surface font-body min-h-screen flex flex-col">
+  
+  <!-- Navigation -->
+  <nav class="bg-surface-container-lowest border-b border-outline-variant px-margin-mobile md:px-margin-desktop flex items-center justify-between sticky top-0 z-50 py-4">
+    <div class="flex items-center">
+      <a class="flex items-center no-underline" href="index.html">
+        <img alt="Linker Adventure Logo" class="w-auto h-20" 
+             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuY9ddTbhAGXCuBfND87a2KFolNvpWmQGCx1WMQIiOSYsdWmvQ7xfYcbu8tDwOzfDzShhUpz30oIqIVnE_bP_r9DaduDq97uE5FZeNqX0NDB_ldp4qAIcKPvnHi1Pe84ghxOha4gXToBM2sIoePb7K09fSSB8HBxTXszw0f8-U2rgUwaFJPlLwm6aDnLB5_eDBNxAQ9Q8gV9YPivMZuo_9kI2He39BoEoVXQ1Eta9Tq2IrLZCtvU4W_3NyjgISdS7-AIopO0fSh9tz" />
+      </a>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-6">
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="index.html">Explore</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#about">About Us</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#contact">Contact</a>
+      <a class="bg-tertiary-container text-on-tertiary font-bold text-sm py-2 px-6 rounded hover:bg-tertiary transition-colors no-underline" href="signin.html">Sign In</a>
+    </div>
+
+    <button class="md:hidden material-symbols-outlined text-on-surface-variant">menu</button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex items-center justify-center px-margin-mobile md:px-margin-desktop py-md">
+    <div class="max-w-4xl w-full">
+      
+      <form id="companyRegisterForm" class="w-full max-w-3xl bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_4px_12px_rgba(92,51,23,0.05)] overflow-hidden">
+        <div id="formMessage" class="hidden text-center py-3 px-4 font-bold text-sm"></div>
+        
+        <!-- Header Section -->
+        <div class="bg-surface-container px-md border-b border-outline-variant text-center py-md">
+          <span class="material-symbols-outlined text-4xl text-primary mb-2">business</span>
+          <h1 class="font-bold text-2xl md:text-3xl text-on-surface">Register Your Tour Company</h1>
+          <p class="text-sm text-on-surface-variant mt-2">Join Linker Adventure and connect with a global network of explorers.</p>
+        </div>
+
+        <div class="p-md space-y-sm md:p-md">
+          
+          <!-- Section 1: Company Details -->
+          <section>
+            <h2 class="text-sm font-bold text-primary mb-sm border-b border-surface-container-high pb-1">Company Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-sm">
+              
+              <div class="flex flex-col gap-xs">
+                <label class="text-xs font-bold text-on-surface-variant" for="companyName">Company Name *</label>
+                <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="companyName" required type="text">
+              </div>
+
+              <div class="flex flex-col gap-xs">
+                <label class="text-xs font-bold text-on-surface-variant" for="regNumber">Registration Number *</label>
+                <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="regNumber" required type="text">
+              </div>
+
+              <div class="flex flex-col gap-xs">
+                <label class="text-xs font-bold text-on-surface-variant" for="bizEmail">Business Email *</label>
+                <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="bizEmail" required type="email">
+              </div>
+
+              <div class="flex flex-col gap-xs">
+                <label class="text-xs font-bold text-on-surface-variant" for="phone">Phone *</label>
+                <div class="flex gap-2">
+                  <select class="w-24 rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-2 text-sm border border-outline" id="countryCode">
+                    <option value="+1">+1</option>
+                    <option value="+44">+44</option>
+                    <option value="+91">+91</option>
+                    <option value="+254">+254</option>
+                    <option value="+51">+51</option>
+                    <option value="+977">+977</option>
+                  </select>
+                  <input class="flex-grow rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="phone" required type="tel">
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-xs">
+                <label class="text-xs font-bold text-on-surface-variant" for="country">Country *</label>
+                <select class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="country" required>
+                  <option value="">Select Country</option>
+                  <option>United States</option>
+                  <option>United Kingdom</option>
+                  <option>India</option>
+                  <option>Kenya</option>
+                  <option>Peru</option>
+                  <option>Nepal</option>
+                </select>
+              </div>
+
+              <div class="flex flex-col gap-xs">
+                <label class="text-xs font-bold text-on-surface-variant" for="city">City *</label>
+                <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="city" required type="text">
+              </div>
+
+              <div class="flex flex-col gap-xs md:col-span-3">
+                <label class="text-xs font-bold text-on-surface-variant" for="address">Business Address *</label>
+                <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="address" required type="text">
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 2: Company Representative -->
+          <section>
+            <h2 class="text-sm font-bold text-primary mb-sm border-b border-surface-container-high pb-1">Company Representative</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+              
+              <div class="flex flex-col gap-xs">
+                <label class="text-xs font-bold text-on-surface-variant" for="managerName">Manager Name *</label>
+                <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="managerName" required type="text">
+              </div>
+
+              <div class="flex flex-col gap-xs">
+                <label class="text-xs font-bold text-on-surface-variant" for="operatorName">Tour Operator Name (Optional)</label>
+                <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="operatorName" type="text">
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 3: Business Verification -->
+          <section>
+            <h2 class="text-sm font-bold text-primary mb-sm border-b border-surface-container-high pb-1">Business Verification</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+              
+              <div class="flex flex-col gap-xs">
+                <label class="text-xs font-bold text-on-surface-variant">Business License *</label>
+                <div class="border border-dashed border-outline-variant rounded p-2 text-center hover:bg-surface-container-low transition-colors cursor-pointer flex items-center justify-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-lg">upload_file</span>
+                  <span class="text-xs text-on-surface-variant">Upload PDF/DOCX</span>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-xs">
+                <label class="text-xs font-bold text-on-surface-variant">Tripadvisor Screenshot (Optional)</label>
+                <div class="border border-dashed border-outline-variant rounded p-2 text-center hover:bg-surface-container-low transition-colors cursor-pointer flex items-center justify-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-lg">image</span>
+                  <span class="text-xs text-on-surface-variant">Upload Image</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Section 4: Account Security -->
+          <section>
+            <h2 class="text-sm font-bold text-primary mb-sm border-b border-surface-container-high pb-1">Account Security</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+              
+              <div class="flex flex-col gap-xs">
+                <label class="text-xs font-bold text-on-surface-variant" for="password">Password *</label>
+                <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="password" required type="password">
+              </div>
+
+              <div class="flex flex-col gap-xs">
+                <label class="text-xs font-bold text-on-surface-variant" for="confirmPassword">Confirm Password *</label>
+                <input class="rounded focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest py-2 px-3 text-sm border border-outline" id="confirmPassword" required type="password">
+              </div>
+            </div>
+          </section>
+
+          <!-- Agreements & Submit -->
+          <div class="space-y-sm pt-sm border-t border-surface-container-high">
+            <div class="flex items-start gap-2">
+              <input class="mt-1 rounded text-primary focus:ring-primary border border-outline" id="infoConfirm" required type="checkbox">
+              <label class="text-xs text-on-surface-variant" for="infoConfirm">I certify that all provided information is truthful and accurate.</label>
+            </div>
+
+            <div class="flex items-start gap-2">
+              <input class="mt-1 rounded text-primary focus:ring-primary border border-outline" id="termsConfirm" required type="checkbox">
+              <label class="text-xs text-on-surface-variant" for="termsConfirm">
+                I agree to <a class="text-primary hover:underline no-underline" href="#terms">Terms</a> &amp; 
+                <a class="text-primary hover:underline no-underline" href="#privacy">Privacy</a>.
+              </label>
+            </div>
+
+            <button class="w-full bg-[#f97316] hover:bg-[#ea580c] text-white font-bold text-sm py-2 px-4 rounded shadow transition-colors flex justify-center items-center gap-2" type="submit">
+              Create Account <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </button>
+
+            <div class="text-center mt-2">
+              <p class="text-xs text-on-surface-variant">
+                Already have an account? 
+                <a class="text-primary font-bold hover:underline no-underline" href="signin.html">Sign In</a>
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </form>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface-container-highest border-t border-outline-variant py-12 px-margin-mobile md:px-margin-desktop mt-auto">
+    <div class="max-w-4xl mx-auto flex flex-col items-center gap-6">
+      <div class="flex flex-wrap justify-center gap-x-6 gap-y-2">
+        <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#terms">Terms of Service</a>
+        <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#privacy">Privacy Policy</a>
+        <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#cookies">Cookies</a>
+        <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#support">Contact Support</a>
+        <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#compliance">Global Trade Compliance</a>
+      </div>
+      <p class="text-xs text-on-surface-variant text-center">© 2026 Linker Adventure. Global Stewardship in Tourism.</p>
+    </div>
+  </footer>
+
+  <!-- Backend Integration Script -->
+  <script>
+    document.getElementById('companyRegisterForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formMessage = document.getElementById('formMessage');
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalBtnHtml = submitBtn.innerHTML;
+      
+      // Basic password validation
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      if (password !== confirmPassword) {
+        formMessage.textContent = "Passwords do not match.";
+        formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
+        return;
+      }
+      
+      // Update UI state
+      submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Processing...';
+      submitBtn.disabled = true;
+      formMessage.className = "hidden";
+      
+      const data = {
+        companyName: document.getElementById('companyName').value,
+        regNumber: document.getElementById('regNumber').value,
+        email: document.getElementById('bizEmail').value,
+        phone: document.getElementById('countryCode').value + document.getElementById('phone').value,
+        country: document.getElementById('country').value,
+        city: document.getElementById('city').value,
+        address: document.getElementById('address').value,
+        managerName: document.getElementById('managerName').value,
+        operatorName: document.getElementById('operatorName').value,
+        password: password
+      };
+
+      try {
+        const response = await fetch('http://localhost:5001/api/auth/register-company', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('token', result.token);
+          localStorage.setItem('userRole', result.role);
+          formMessage.textContent = "Registration successful! Redirecting...";
+          formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-[#d1fae5] text-[#065f46] block";
+          // Redirect or handle successful login
+          setTimeout(() => {
+            window.location.href = 'signin.html';
+          }, 2000);
+        } else {
+          formMessage.textContent = result.message || "Registration failed. Please try again.";
+          formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
+          submitBtn.innerHTML = originalBtnHtml;
+          submitBtn.disabled = false;
+        }
+      } catch (error) {
+        formMessage.textContent = "A network error occurred. Please try again.";
+        formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
+        submitBtn.innerHTML = originalBtnHtml;
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

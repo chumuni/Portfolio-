@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Sign In - Linker Adventure</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#421e04",
+            "primary-container": "#5c3317",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#d69b77",
+            "on-primary-fixed": "#321300",
+            secondary: "#52606c",
+            "secondary-container": "#d5e4f3",
+            "secondary-fixed-dim": "#b9c8d7",
+            "on-secondary": "#ffffff",
+            "on-secondary-fixed": "#0f1d28",
+            "on-secondary-container": "#586673",
+            "on-secondary-fixed-variant": "#3a4854",
+            tertiary: "#002d31",
+            "tertiary-container": "#00454a",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#7cb2b7",
+            "on-tertiary-fixed": "#002022",
+            "on-tertiary-fixed-variant": "#114e53",
+            "tertiary-fixed": "#b5ecf2",
+            "tertiary-fixed-dim": "#99d0d6",
+            background: "#fff8f5",
+            surface: "#fff8f5",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#fdf1ec",
+            "surface-container": "#f7ece7",
+            "surface-container-high": "#f1e6e1",
+            "surface-container-highest": "#ebe0db",
+            "on-surface": "#201b18",
+            "on-surface-variant": "#51443d",
+            "on-background": "#201b18",
+            "outline-variant": "#d6c3b9",
+            "outline": "#84746c",
+            "error": "#ba1a1a",
+            "on-error": "#ffffff",
+            "on-error-container": "#93000a",
+            "error-container": "#ffdad6",
+            "inverse-primary": "#f8b993",
+            "primary-fixed": "#ffdbc8",
+            "primary-fixed-dim": "#f8b993",
+            "on-primary-fixed-variant": "#673c1f"
+          },
+          spacing: {
+            xs: "4px",
+            sm: "12px",
+            base: "8px",
+            md: "24px",
+            lg: "48px",
+            xl: "80px",
+            "margin-mobile": "16px",
+            "margin-desktop": "64px",
+            gutter: "24px"
+          },
+          fontFamily: {
+            display: ["Montserrat"],
+            body: ["Inter"]
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #fff8f5;
+      color: #201b18;
+    }
+    
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(214, 195, 185, 0.3);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col selection:bg-primary-fixed selection:text-on-primary-fixed">
+  
+  <div class="fixed inset-0 z-[-1] overflow-hidden">
+    <div class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20" 
+         style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAMkaV2HAZi4qYyg3-WIRkirn9nd_PwvCj3SmAFOCLIv6yQIJtThop7MH54R7tYy6HNYIGLv4UuSl2g1l9HiGGAN-5X6DDRVBVqFje04ACub0JMoK0LzU7r2B5DnioBKk3XocgV5-IzAMZOLEQEkErzSuw0PP0f6hh48lbFriFLDfrxhYYnpEZLU7hTn6IOfefj3oTrNQ9zJ-VYPKnGxVphE8dohlnUeto3KI3Ichdssl8UiJYE24Kr7wy8ZBYV2izK04c7Qisj0y7G');"></div>
+    <div class="absolute inset-0 bg-surface/60 backdrop-blur-[2px]"></div>
+  </div>
+
+  <!-- TopNavBar -->
+  <header class="bg-surface shadow-sm z-50">
+    <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto py-md">
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="flex items-center no-underline">
+          <img alt="Linker Adventure Logo" class="w-auto h-20" 
+               src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl7ioLO6zz7BrR-vOuqWO2Yk3NoOsFAIvaxeUa-eUPvVce_ZzNysJs9yDXdOOWwzIvf2VUOpkDE4KQ_EkhB4_EtSZ7tD_FUkcDT7ke6Xy5aLDIdM5nFSAeTbLr2qr5n6LlIUCAWG-pprIpbHeQwzR0D2hEJ02yEcXv84DUxGknZnpsgvjysk7h6SF7Z7hdqALTQh9M6y1D4VzDCTrhisORBlnGbcdN0YoRzFZXgonwgajHgWM5EU24yhlCkqsuLPCLYnDA3LgFIQo4" />
+        </a>
+      </div>
+      <a class="text-on-surface-variant font-label-md text-sm hover:text-primary transition-colors no-underline" href="#support">Help</a>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow flex items-center justify-center relative overflow-hidden px-margin-mobile py-lg min-h-[calc(100vh-160px)]">
+    
+    <!-- Login Card -->
+    <div class="z-10 w-full max-w-[440px] glass-card rounded-xl shadow-xl p-md md:p-lg animate-in fade-in zoom-in duration-500">
+      
+      <div class="text-center mb-md">
+        <h2 class="font-bold text-2xl md:text-3xl text-primary mb-2">Welcome Back</h2>
+        <p class="text-sm text-on-surface-variant">Access your stewardship dashboard</p>
+      </div>
+
+      <form id="loginForm" class="space-y-md">
+        <div id="formMessage" class="hidden text-center py-3 px-4 font-bold text-sm"></div>
+        
+        <!-- Email Field -->
+        <div class="space-y-xs">
+          <label class="font-bold text-sm text-on-surface-variant" for="email">Email Address</label>
+          <div class="relative group">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px] group-focus-within:text-primary transition-colors">mail</span>
+            <input class="w-full pl-10 pr-4 py-3 bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary outline-none transition-all text-sm" 
+                   id="email" type="email" placeholder="you@example.com">
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="space-y-xs">
+          <div class="flex justify-between items-center">
+            <label class="font-bold text-sm text-on-surface-variant" for="password">Password</label>
+            <a class="font-bold text-sm text-primary hover:underline no-underline" href="#forgot">Forgot Password?</a>
+          </div>
+          <div class="relative group">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px] group-focus-within:text-primary transition-colors">lock</span>
+            <input class="w-full pl-10 pr-12 py-3 bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary outline-none transition-all text-sm" 
+                   id="password" type="password" placeholder="••••••••">
+            <button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface" type="button">
+              <span class="material-symbols-outlined text-[20px]">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me -->
+        <div class="flex items-center gap-xs">
+          <input class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer" id="remember" type="checkbox">
+          <label class="text-sm text-on-surface-variant cursor-pointer" for="remember">Keep me signed in for 30 days</label>
+        </div>
+
+        <!-- Primary Button -->
+        <button class="w-full py-3 bg-primary text-on-primary font-bold text-sm rounded-lg shadow-md hover:bg-primary-container transition-all transform active:scale-[0.98] mt-base" type="submit">
+          Sign In
+        </button>
+      </form>
+
+      <!-- Social Login Divider -->
+      <div class="relative my-lg">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-outline-variant"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-md bg-white text-on-surface-variant">Partner Authentication</span>
+        </div>
+      </div>
+
+      <!-- SSO / Social -->
+      <div class="grid grid-cols-2 gap-sm">
+        <button class="flex items-center justify-center gap-2 py-2 border border-outline-variant rounded-lg hover:bg-surface-container transition-colors text-sm font-bold">
+          <div class="w-5 h-5 bg-cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDSAE-xuVFl2mQlNinnMn5PuVe-EDZlDwkW1qYNhcdvN4LQUijvHU6tahcNeZ8g9qtZkJNCqWxJGzFm0JIQ3ZXhKOulPlZpQvd0Jh6O8qKH5gS3G8M__tX9iSygjxOZmUktLZr4ias1HbJlswzOM54qemqEyxUlPPBUkJsB4XWD7BSeS_6q8NJvU6AK-OX4VXzzMQM0q-OFF3HohKTQswqAm6mI70Bt3Hq-Rel-f_f6T3rr7JKQoUO5JNnWwmMlwUOYaMS4RR4Ozwrc')"></div>
+          Google
+        </button>
+        <button class="flex items-center justify-center gap-2 py-2 border border-outline-variant rounded-lg hover:bg-surface-container transition-colors text-sm font-bold">
+          <span class="material-symbols-outlined text-on-surface text-[20px]">corporate_fare</span>
+          SSO
+        </button>
+      </div>
+
+      <!-- Create Account -->
+      <div class="text-center mt-lg">
+        <p class="text-sm text-on-surface-variant">
+          New to the network? 
+          <a class="text-primary font-bold hover:underline ml-xs no-underline" href="register-tour-agent.html">Create an Account</a>
+        </p>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-md bg-surface-container-highest border-t border-outline-variant py-md">
+    <div class="flex flex-col items-center md:items-start gap-xs">
+      <span class="font-headline-md font-bold text-on-surface">Linker Adventure</span>
+      <p class="text-sm text-on-surface-variant">© 2026 Linker Adventure. Global Stewardship in Tourism.</p>
+    </div>
+    <div class="flex flex-wrap justify-center md:justify-end gap-x-lg gap-y-sm">
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#terms">Terms of Service</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#privacy">Privacy Policy</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#cookies">Cookies</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#support">Contact Support</a>
+      <a class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline" href="#compliance">Global Trade Compliance</a>
+    </div>
+  </footer>
+
+  <script>
+    // Micro-interaction for form inputs
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('focus', () => {
+        const card = input.closest('.glass-card');
+        if (card) card.style.boxShadow = '0 20px 25px -5px rgba(66, 30, 4, 0.1), 0 8px 10px -6px rgba(66, 30, 4, 0.1)';
+      });
+      input.addEventListener('blur', () => {
+        const card = input.closest('.glass-card');
+        if (card) card.style.boxShadow = '0 4px 12px rgba(92, 51, 23, 0.05)';
+      });
+    });
+  </script>
+
+  <!-- Backend Integration Script -->
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formMessage = document.getElementById('formMessage');
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalBtnHtml = submitBtn.innerHTML;
+      
+      // Update UI state
+      submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Signing In...';
+      submitBtn.disabled = true;
+      formMessage.className = "hidden";
+      
+      const data = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      };
+
+      try {
+        const response = await fetch('http://localhost:5001/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          formMessage.textContent = "Sign in successful!";
+          formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-[#d1fae5] text-[#065f46] block";
+          
+          localStorage.setItem('token', result.token);
+          localStorage.setItem('userRole', result.role);
+          
+          setTimeout(() => {
+            // Redirect based on role or to dashboard
+            window.location.href = 'index.html'; 
+          }, 1000);
+        } else {
+          formMessage.textContent = result.message || "Invalid credentials.";
+          formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
+          submitBtn.innerHTML = originalBtnHtml;
+          submitBtn.disabled = false;
+        }
+      } catch (error) {
+        formMessage.textContent = "A network error occurred. Please try again.";
+        formMessage.className = "text-center py-3 px-4 font-bold text-sm bg-error-container text-on-error-container block";
+        submitBtn.innerHTML = originalBtnHtml;
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
