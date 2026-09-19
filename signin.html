@@ -270,8 +270,7 @@
           localStorage.setItem('userEmail', result.data.user.email);
 
           setTimeout(() => {
-            // Redirect based on role or to dashboard
-            window.location.href = 'index.html';
+            window.location.href = 'dashboard.html';
           }, 1000);
         } else {
           formMessage.textContent = result.error?.message || "Invalid credentials.";

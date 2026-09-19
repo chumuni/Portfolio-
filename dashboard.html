@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Dashboard - Linker Adventure</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#421e04",
+            "primary-container": "#5c3317",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#d69b77",
+            secondary: "#52606c",
+            "secondary-container": "#d5e4f3",
+            "on-secondary": "#ffffff",
+            tertiary: "#002d31",
+            "tertiary-container": "#00454a",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#7cb2b7",
+            background: "#fff8f5",
+            surface: "#fff8f5",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#fdf1ec",
+            "surface-container": "#f7ece7",
+            "surface-container-high": "#f1e6e1",
+            "surface-container-highest": "#ebe0db",
+            "on-surface": "#201b18",
+            "on-surface-variant": "#51443d",
+            "outline-variant": "#d6c3b9",
+            "outline": "#84746c",
+            error: "#ba1a1a",
+            "on-error": "#ffffff"
+          },
+          spacing: {
+            xs: "4px", sm: "12px", base: "8px", md: "24px", lg: "48px", xl: "80px",
+            "margin-mobile": "16px", "margin-desktop": "64px", gutter: "24px"
+          },
+          fontFamily: { display: ["Montserrat"], body: ["Inter"] }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+
+<body class="bg-background text-on-background font-body antialiased min-h-screen flex flex-col">
+
+  <!-- TopNavBar -->
+  <nav class="bg-surface shadow-sm sticky top-0 z-50">
+    <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-[1440px] mx-auto">
+      <a href="index.html" class="font-bold text-lg text-primary no-underline">Linker Adventure</a>
+      <div class="flex items-center gap-sm">
+        <a href="index.html" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline hidden md:block">Home</a>
+        <button id="signOutBtn" class="text-sm bg-primary text-on-primary px-4 py-2 rounded hover:bg-primary-container transition-colors">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-grow w-full max-w-[1100px] mx-auto px-margin-mobile md:px-margin-desktop py-lg">
+
+    <div id="loadingState" class="text-center py-xl text-on-surface-variant">
+      <span class="material-symbols-outlined animate-spin text-3xl">sync</span>
+      <p class="mt-2 text-sm">Loading your dashboard…</p>
+    </div>
+
+    <div id="errorState" class="hidden text-center py-xl">
+      <p class="text-error font-bold" id="errorMessage">Something went wrong.</p>
+      <p class="text-sm text-on-surface-variant mt-2">Make sure the API server is running at the address configured in <code>assets/js/api-config.js</code>.</p>
+    </div>
+
+    <div id="dashboardContent" class="hidden space-y-lg">
+
+      <!-- Welcome header -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-sm">
+        <div>
+          <p class="text-sm text-on-surface-variant">Welcome back</p>
+          <h1 class="font-bold text-2xl md:text-3xl text-on-surface" id="welcomeName">—</h1>
+          <span id="roleBadge" class="inline-block mt-1 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary"></span>
+        </div>
+        <div id="verifiedBadge" class="hidden items-center gap-2 text-sm font-bold text-primary bg-surface-container-low px-3 py-2 rounded-lg">
+          <span class="material-symbols-outlined text-lg">verified</span> Verified profile
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-sm">
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center">
+          <p class="font-bold text-2xl text-primary" id="statViews">0</p>
+          <p class="text-xs text-on-surface-variant mt-1">Profile views (30d)</p>
+        </div>
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center">
+          <p class="font-bold text-2xl text-primary" id="statMatched">0</p>
+          <p class="text-xs text-on-surface-variant mt-1">Matched connections</p>
+        </div>
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center">
+          <p class="font-bold text-2xl text-primary" id="statRating">—</p>
+          <p class="text-xs text-on-surface-variant mt-1">Average rating</p>
+        </div>
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-center">
+          <p class="font-bold text-2xl text-primary" id="statUnread">0</p>
+          <p class="text-xs text-on-surface-variant mt-1">Unread messages</p>
+        </div>
+      </div>
+
+      <!-- Connections breakdown -->
+      <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+        <h2 class="font-bold text-sm text-primary mb-sm border-b border-surface-container-high pb-1">Connections</h2>
+        <div class="grid grid-cols-3 gap-sm text-center">
+          <div>
+            <p class="font-bold text-xl text-on-surface" id="connPending">0</p>
+            <p class="text-xs text-on-surface-variant">Pending</p>
+          </div>
+          <div>
+            <p class="font-bold text-xl text-on-surface" id="connMatched">0</p>
+            <p class="text-xs text-on-surface-variant">Matched</p>
+          </div>
+          <div>
+            <p class="font-bold text-xl text-on-surface" id="connDeclined">0</p>
+            <p class="text-xs text-on-surface-variant">Declined</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Role-specific panel -->
+      <section id="companyPanel" class="hidden bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+        <h2 class="font-bold text-sm text-primary mb-sm border-b border-surface-container-high pb-1">Your Company</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-sm text-sm">
+          <p><span class="text-on-surface-variant">Recruiting:</span> <span id="companyRecruiting" class="font-bold"></span></p>
+          <p><span class="text-on-surface-variant">Open vacancies:</span> <span id="companyOpenVacancies" class="font-bold"></span></p>
+        </div>
+        <h3 class="font-bold text-xs text-on-surface-variant mt-md mb-1">Application pipeline</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-sm text-center">
+          <div><p class="font-bold text-lg" id="appTotal">0</p><p class="text-xs text-on-surface-variant">Total</p></div>
+          <div><p class="font-bold text-lg" id="appSubmitted">0</p><p class="text-xs text-on-surface-variant">Submitted</p></div>
+          <div><p class="font-bold text-lg" id="appShortlisted">0</p><p class="text-xs text-on-surface-variant">Shortlisted</p></div>
+          <div><p class="font-bold text-lg" id="appAccepted">0</p><p class="text-xs text-on-surface-variant">Accepted</p></div>
+        </div>
+      </section>
+
+      <section id="agentPanel" class="hidden bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+        <h2 class="font-bold text-sm text-primary mb-sm border-b border-surface-container-high pb-1">Your Availability</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-sm text-sm">
+          <p><span class="text-on-surface-variant">Status:</span> <span id="agentAvailability" class="font-bold"></span></p>
+          <p><span class="text-on-surface-variant">Open to work:</span> <span id="agentOpenToWork" class="font-bold"></span></p>
+        </div>
+      </section>
+
+      <!-- Profile summary -->
+      <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+        <h2 class="font-bold text-sm text-primary mb-sm border-b border-surface-container-high pb-1">Profile</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-sm text-sm" id="profileSummary"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface-container-highest w-full px-margin-mobile md:px-margin-desktop py-lg flex flex-col md:flex-row justify-between items-center gap-md border-t border-outline-variant mt-auto">
+    <div class="text-xs text-on-surface-variant">© 2026 Linker Adventure. Global Stewardship in Tourism.</div>
+    <a class="text-sm text-primary hover:underline no-underline" href="legal.html#support">Contact Support</a>
+  </footer>
+
+  <script src="assets/js/api-config.js"></script>
+  <script>
+    if (!localStorage.getItem('accessToken')) {
+      window.location.href = 'signin.html';
+    }
+
+    document.getElementById('signOutBtn').addEventListener('click', async () => {
+      const refreshToken = localStorage.getItem('refreshToken');
+      try {
+        await fetch(`${API_BASE}/auth/logout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+        });
+      } catch {
+        // Best-effort server-side revocation — still sign out locally either way.
+      }
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userEmail');
+      window.location.href = 'signin.html';
+    });
+
+    function showError(message) {
+      document.getElementById('loadingState').classList.add('hidden');
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorState').classList.remove('hidden');
+    }
+
+    function fmtLabel(value) {
+      return String(value ?? '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+    async function loadDashboard() {
+      const [meRes, dashRes] = await Promise.all([
+        authFetch('/auth/me'),
+        authFetch('/analytics/dashboard'),
+      ]);
+      if (!meRes || !dashRes) return; // authFetch already redirected to signin.html
+
+      if (!meRes.ok || !dashRes.ok) {
+        const failed = !meRes.ok ? await meRes.json().catch(() => ({})) : await dashRes.json().catch(() => ({}));
+        showError(failed.error?.message || 'Could not load your dashboard.');
+        return;
+      }
+
+      const me = (await meRes.json()).data;
+      const dash = (await dashRes.json()).data;
+      const { user, profile } = me;
+
+      document.getElementById('welcomeName').textContent = profile?.companyName || profile?.fullName || user.email;
+      document.getElementById('roleBadge').textContent = user.role === 'company' ? 'Tour Company' : 'Tour Agent';
+      if (profile?.isVerified) document.getElementById('verifiedBadge').classList.remove('hidden');
+      document.getElementById('verifiedBadge').classList.toggle('flex', !!profile?.isVerified);
+
+      document.getElementById('statViews').textContent = dash.profileViews.window;
+      document.getElementById('statMatched').textContent = dash.connections.matched;
+      document.getElementById('statRating').textContent = dash.rating.count > 0 ? `${dash.rating.average.toFixed(1)} ★` : '—';
+      document.getElementById('statUnread').textContent = dash.unreadMessages;
+
+      document.getElementById('connPending').textContent = dash.connections.pending;
+      document.getElementById('connMatched').textContent = dash.connections.matched;
+      document.getElementById('connDeclined').textContent = dash.connections.declined;
+
+      if (user.role === 'company') {
+        document.getElementById('companyPanel').classList.remove('hidden');
+        document.getElementById('companyRecruiting').textContent = dash.isRecruiting ? 'Yes' : 'No';
+        document.getElementById('companyOpenVacancies').textContent = dash.vacancies.open;
+        document.getElementById('appTotal').textContent = dash.applications.total;
+        document.getElementById('appSubmitted').textContent = dash.applications.submitted;
+        document.getElementById('appShortlisted').textContent = dash.applications.shortlisted;
+        document.getElementById('appAccepted').textContent = dash.applications.accepted;
+      } else {
+        document.getElementById('agentPanel').classList.remove('hidden');
+        document.getElementById('agentAvailability').textContent = fmtLabel(dash.availability);
+        document.getElementById('agentOpenToWork').textContent = dash.isOpenToWork ? 'Yes' : 'No';
+      }
+
+      const fields = user.role === 'company'
+        ? [['Email', user.email], ['Country', profile?.country], ['City', profile?.city], ['Phone', profile?.phone], ['Licence Number', profile?.licenceNumber], ['Manager', profile?.managerName]]
+        : [['Email', user.email], ['Country', profile?.country], ['City', profile?.city], ['Phone', profile?.phone], ['Years Experience', profile?.yearsExperience], ['Specializations', (profile?.specializations || []).join(', ') || '—']];
+
+      document.getElementById('profileSummary').innerHTML = fields
+        .filter(([, value]) => value !== undefined && value !== null && value !== '')
+        .map(([label, value]) => `<p><span class="text-on-surface-variant">${label}:</span> <span class="font-bold">${value}</span></p>`)
+        .join('');
+
+      document.getElementById('loadingState').classList.add('hidden');
+      document.getElementById('dashboardContent').classList.remove('hidden');
+    }
+
+    loadDashboard().catch((error) => showError(error.message || 'A network error occurred.'));
+  </script>
+</body>
+</html>

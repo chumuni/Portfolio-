@@ -102,8 +102,8 @@
 
       <!-- Auth Buttons -->
       <div class="flex items-center gap-sm">
-        <a href="signin.html" class="hidden md:block font-label-md text-label-md text-primary hover:bg-surface-container-low px-4 py-2 rounded-md transition-all">Sign In</a>
-        <a href="register-tour-agent.html" class="font-label-md text-label-md bg-primary text-on-primary px-4 py-2 rounded-md hover:bg-primary-container transition-all shadow-sm">Get Started</a>
+        <a id="navSignIn" href="signin.html" class="hidden md:block font-label-md text-label-md text-primary hover:bg-surface-container-low px-4 py-2 rounded-md transition-all">Sign In</a>
+        <a id="navGetStarted" href="register-tour-agent.html" class="font-label-md text-label-md bg-primary text-on-primary px-4 py-2 rounded-md hover:bg-primary-container transition-all shadow-sm">Get Started</a>
       </div>
     </nav>
   </header>
@@ -264,5 +264,9 @@
     </div>
   </footer>
 
+  <script src="assets/js/api-config.js"></script>
+  <script>
+    reflectAuthState({ signInSelector: '#navSignIn', getStartedSelector: '#navGetStarted' });
+  </script>
 </body>
 </html>
