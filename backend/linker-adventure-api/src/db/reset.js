@@ -1,14 +1,17 @@
-import fs from 'node:fs';
-import { config } from '../config/env.js';
-import { closeDb } from './index.js';
-import { runMigrations } from './migrate.js';
+import { connectDb, closeDb } from './index.js';
+import * as models from './models.js';
 import { logger } from '../config/logger.js';
 
-closeDb();
-for (const suffix of ['', '-wal', '-shm']) {
-  const file = `${config.db.file}${suffix}`;
-  if (fs.existsSync(file)) fs.rmSync(file);
+async function reset() {
+  await connectDb();
+  const modelList = Object.values(models);
+  await Promise.all(modelList.map((model) => model.deleteMany({})));
+  logger.warn(`Cleared ${modelList.length} collections`);
 }
-logger.warn('Database dropped', { file: config.db.file });
-runMigrations();
-closeDb();
+
+reset()
+  .then(closeDb)
+  .catch((error) => {
+    logger.error(`Reset failed: ${error.message}`);
+    process.exit(1);
+  });

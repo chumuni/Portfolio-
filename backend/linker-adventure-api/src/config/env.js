@@ -31,7 +31,9 @@ export const config = Object.freeze({
   rootDir,
 
   db: {
-    file: path.resolve(rootDir, process.env.DATABASE_FILE ?? './storage/linker-adventure.db'),
+    uri: required('MONGODB_URI', 'mongodb://127.0.0.1:27017/linker_adventure_dev'),
+    // Optional: only needed if your connection string doesn't already end in /<dbName>.
+    name: process.env.MONGODB_DB_NAME || undefined,
   },
 
   jwt: {

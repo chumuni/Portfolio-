@@ -1,38 +1,39 @@
-import { query } from '../db/index.js';
+import { Credential } from '../db/models.js';
 
-const map = (row) => row && ({
-  id: row.id,
-  agentProfileId: row.agent_profile_id,
-  title: row.title,
-  issuer: row.issuer,
-  credentialType: row.credential_type,
-  issuedAt: row.issued_at,
-  expiresAt: row.expires_at,
-  fileUrl: row.file_path,
-  isVerified: Boolean(row.is_verified),
-  createdAt: row.created_at,
+const map = (doc) => doc && ({
+  id: doc._id.toString(),
+  agentProfileId: doc.agentProfileId.toString(),
+  title: doc.title,
+  issuer: doc.issuer ?? null,
+  credentialType: doc.credentialType,
+  issuedAt: doc.issuedAt ?? null,
+  expiresAt: doc.expiresAt ?? null,
+  fileUrl: doc.filePath ?? null,
+  isVerified: Boolean(doc.isVerified),
+  createdAt: doc.createdAt.toISOString(),
 });
 
-export const findById = (id) => map(query.get('SELECT * FROM credentials WHERE id = ?', [id]));
+export const findById = async (id) => map(await Credential.findById(id));
 
-export const listForAgent = (agentProfileId) =>
-  query.all('SELECT * FROM credentials WHERE agent_profile_id = ? ORDER BY COALESCE(issued_at, created_at) DESC', [agentProfileId]).map(map);
-
-export function create(agentProfileId, input) {
-  const id = query.insert(
-    `INSERT INTO credentials (agent_profile_id, title, issuer, credential_type, issued_at, expires_at, file_path)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [
-      agentProfileId,
-      input.title,
-      input.issuer ?? null,
-      input.credentialType ?? 'certificate',
-      input.issuedAt ?? null,
-      input.expiresAt ?? null,
-      input.fileUrl ?? null,
-    ],
-  );
-  return findById(id);
+export async function listForAgent(agentProfileId) {
+  const docs = await Credential.find({ agentProfileId }).sort({ issuedAt: -1, createdAt: -1 });
+  return docs.map(map);
 }
 
-export const remove = (id) => query.run('DELETE FROM credentials WHERE id = ?', [id]).changes > 0;
+export async function create(agentProfileId, input) {
+  const doc = await Credential.create({
+    agentProfileId,
+    title: input.title,
+    issuer: input.issuer ?? null,
+    credentialType: input.credentialType ?? 'certificate',
+    issuedAt: input.issuedAt ?? null,
+    expiresAt: input.expiresAt ?? null,
+    filePath: input.fileUrl ?? null,
+  });
+  return map(doc);
+}
+
+export async function remove(id) {
+  const result = await Credential.deleteOne({ _id: id });
+  return result.deletedCount > 0;
+}

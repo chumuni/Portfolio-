@@ -1,79 +1,75 @@
-import { query } from '../db/index.js';
+import mongoose from 'mongoose';
+import { Review } from '../db/models.js';
 
-const map = (row) => row && ({
-  id: row.id,
-  subjectType: row.subject_type,
-  subjectId: row.subject_id,
-  authorUserId: row.author_user_id,
-  connectionId: row.connection_id,
-  kind: row.kind,
-  rating: row.rating,
-  title: row.title,
-  body: row.body,
-  reviewerName: row.reviewer_name,
-  reviewerRole: row.reviewer_role,
-  referredBy: row.referred_by,
-  isPublished: Boolean(row.is_published),
-  createdAt: row.created_at,
+const map = (doc) => doc && ({
+  id: doc._id.toString(),
+  subjectType: doc.subjectType,
+  subjectId: doc.subjectId.toString(),
+  authorUserId: doc.authorUserId ? doc.authorUserId.toString() : null,
+  connectionId: doc.connectionId ? doc.connectionId.toString() : null,
+  kind: doc.kind,
+  rating: doc.rating,
+  title: doc.title ?? null,
+  body: doc.body,
+  reviewerName: doc.reviewerName ?? null,
+  reviewerRole: doc.reviewerRole ?? null,
+  referredBy: doc.referredBy ?? null,
+  isPublished: Boolean(doc.isPublished),
+  createdAt: doc.createdAt.toISOString(),
 });
 
-export const findById = (id) => map(query.get('SELECT * FROM reviews WHERE id = ?', [id]));
+export const findById = async (id) => map(await Review.findById(id));
 
-export function create(input) {
-  const id = query.insert(
-    `INSERT INTO reviews
-       (subject_type, subject_id, author_user_id, connection_id, kind, rating, title, body, reviewer_name, reviewer_role, referred_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      input.subjectType,
-      input.subjectId,
-      input.authorUserId ?? null,
-      input.connectionId ?? null,
-      input.kind ?? 'partner',
-      input.rating,
-      input.title ?? null,
-      input.body,
-      input.reviewerName ?? null,
-      input.reviewerRole ?? null,
-      input.referredBy ?? null,
-    ],
-  );
-  return findById(id);
+export async function create(input) {
+  const doc = await Review.create({
+    subjectType: input.subjectType,
+    subjectId: input.subjectId,
+    authorUserId: input.authorUserId ?? null,
+    connectionId: input.connectionId ?? null,
+    kind: input.kind ?? 'partner',
+    rating: input.rating,
+    title: input.title ?? null,
+    body: input.body,
+    reviewerName: input.reviewerName ?? null,
+    reviewerRole: input.reviewerRole ?? null,
+    referredBy: input.referredBy ?? null,
+  });
+  return map(doc);
 }
 
-export function listForSubject(subjectType, subjectId, { kind, offset, perPage }) {
-  const where = ['subject_type = ?', 'subject_id = ?', 'is_published = 1'];
-  const params = [subjectType, subjectId];
-  if (kind) { where.push('kind = ?'); params.push(kind); }
+export async function listForSubject(subjectType, subjectId, { kind, offset, perPage }) {
+  const where = { subjectType, subjectId, isPublished: true };
+  if (kind) where.kind = kind;
 
-  const clause = where.join(' AND ');
-  const total = query.count(`SELECT COUNT(*) FROM reviews WHERE ${clause}`, params);
-  const rows = query.all(`SELECT * FROM reviews WHERE ${clause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-    [...params, perPage, offset]);
-  return { items: rows.map(map), total };
+  const [total, docs] = await Promise.all([
+    Review.countDocuments(where),
+    Review.find(where).sort({ createdAt: -1 }).skip(offset).limit(perPage),
+  ]);
+  return { items: docs.map(map), total };
 }
 
-export const hasReviewed = (authorUserId, subjectType, subjectId) =>
-  query.count('SELECT COUNT(*) FROM reviews WHERE author_user_id = ? AND subject_type = ? AND subject_id = ?',
-    [authorUserId, subjectType, subjectId]) > 0;
+export async function hasReviewed(authorUserId, subjectType, subjectId) {
+  return (await Review.exists({ authorUserId, subjectType, subjectId })) !== null;
+}
 
 /** Aggregate used to keep the denormalised rating on the profile in step. */
-export function aggregateForSubject(subjectType, subjectId) {
-  const row = query.get(
-    `SELECT COUNT(*) AS count, COALESCE(AVG(rating), 0) AS average
-       FROM reviews WHERE subject_type = ? AND subject_id = ? AND is_published = 1`,
-    [subjectType, subjectId],
-  );
-  return { count: Number(row?.count ?? 0), average: Math.round(Number(row?.average ?? 0) * 100) / 100 };
+export async function aggregateForSubject(subjectType, subjectId) {
+  const [result] = await Review.aggregate([
+    { $match: { subjectType, subjectId: new mongoose.Types.ObjectId(subjectId), isPublished: true } },
+    { $group: { _id: null, count: { $sum: 1 }, average: { $avg: '$rating' } } },
+  ]);
+  return {
+    count: result?.count ?? 0,
+    average: Math.round((result?.average ?? 0) * 100) / 100,
+  };
 }
 
-export function ratingBreakdown(subjectType, subjectId) {
-  const rows = query.all(
-    `SELECT rating, COUNT(*) AS count FROM reviews
-      WHERE subject_type = ? AND subject_id = ? AND is_published = 1 GROUP BY rating`,
-    [subjectType, subjectId],
-  );
+export async function ratingBreakdown(subjectType, subjectId) {
+  const rows = await Review.aggregate([
+    { $match: { subjectType, subjectId: new mongoose.Types.ObjectId(subjectId), isPublished: true } },
+    { $group: { _id: '$rating', count: { $sum: 1 } } },
+  ]);
   const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-  for (const row of rows) breakdown[row.rating] = Number(row.count);
+  for (const row of rows) breakdown[row._id] = row.count;
   return breakdown;
 }

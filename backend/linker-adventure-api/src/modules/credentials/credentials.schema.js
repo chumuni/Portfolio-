@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { objectId } from '../../utils/objectId.js';
 
 export const createCredentialSchema = z.object({
   title: z.string().trim().min(2).max(150),
@@ -8,4 +9,4 @@ export const createCredentialSchema = z.object({
   expiresAt: z.string().trim().max(30).optional(),
 });
 
-export const idParamSchema = z.object({ id: z.coerce.number().int().positive() });
+export const idParamSchema = z.object({ id: objectId });

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { objectId } from '../../utils/objectId.js';
 
 export const applySchema = z.object({
   coverLetter: z.string().trim().max(4000).optional(),
@@ -14,4 +15,4 @@ export const decisionSchema = z.object({
   status: z.enum(['shortlisted', 'accepted', 'rejected']),
 });
 
-export const idParamSchema = z.object({ id: z.coerce.number().int().positive() });
+export const idParamSchema = z.object({ id: objectId });

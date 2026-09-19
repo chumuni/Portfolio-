@@ -1,53 +1,93 @@
-import { query, nowIso } from '../db/index.js';
+import { User, RefreshToken } from '../db/models.js';
+import { isValidId } from '../db/index.js';
 
-const SAFE_COLUMNS = 'id, email, role, status, email_verified, last_login_at, created_at, updated_at';
+/**
+ * Field names here intentionally match the old SQL row shape (snake_case for
+ * created_at/password_hash) — auth.service.js and middleware/authenticate.js
+ * read those names directly, and keeping them avoids touching those files.
+ */
+const toUserRow = (doc) => doc && ({
+  id: doc._id.toString(),
+  email: doc.email,
+  password_hash: doc.passwordHash,
+  role: doc.role,
+  status: doc.status,
+  email_verified: doc.emailVerified,
+  last_login_at: doc.lastLoginAt ? doc.lastLoginAt.toISOString() : null,
+  created_at: doc.createdAt.toISOString(),
+  updated_at: doc.updatedAt.toISOString(),
+});
 
-export const findById = (id) => query.get(`SELECT ${SAFE_COLUMNS} FROM users WHERE id = ?`, [id]);
-
-export const findByEmail = (email) => query.get('SELECT * FROM users WHERE email = ?', [email]);
-
-export const emailExists = (email) => query.count('SELECT COUNT(*) FROM users WHERE email = ?', [email]) > 0;
-
-export function create({ email, passwordHash, role }) {
-  const id = query.insert(
-    'INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)',
-    [email, passwordHash, role],
-  );
-  return findById(id);
+export async function findById(id) {
+  if (!isValidId(id)) return null;
+  return toUserRow(await User.findById(id));
 }
 
-export function touchLogin(id) {
-  query.run('UPDATE users SET last_login_at = ?, updated_at = ? WHERE id = ?', [nowIso(), nowIso(), id]);
+export async function findByEmail(email) {
+  return toUserRow(await User.findOne({ email: email.toLowerCase() }));
 }
 
-export function updatePassword(id, passwordHash) {
-  query.run('UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?', [passwordHash, nowIso(), id]);
+export async function emailExists(email) {
+  return (await User.exists({ email: email.toLowerCase() })) !== null;
 }
 
-export function findPasswordHash(id) {
-  return query.get('SELECT password_hash FROM users WHERE id = ?', [id])?.password_hash ?? null;
+export async function create({ email, passwordHash, role }) {
+  const doc = await User.create({ email, passwordHash, role });
+  return toUserRow(doc);
+}
+
+/** Compensating rollback for a registration whose profile step failed. */
+export async function remove(id) {
+  await User.deleteOne({ _id: id });
+}
+
+export async function touchLogin(id) {
+  await User.updateOne({ _id: id }, { lastLoginAt: new Date() });
+}
+
+export async function updatePassword(id, passwordHash) {
+  await User.updateOne({ _id: id }, { passwordHash });
+}
+
+export async function findPasswordHash(id) {
+  const doc = await User.findById(id).select('passwordHash');
+  return doc?.passwordHash ?? null;
 }
 
 /* ----------------------------- refresh tokens ---------------------------- */
 
-export function storeRefreshToken({ userId, tokenHash, expiresAt, userAgent }) {
-  return query.insert(
-    'INSERT INTO refresh_tokens (user_id, token_hash, expires_at, user_agent) VALUES (?, ?, ?, ?)',
-    [userId, tokenHash, expiresAt, userAgent ?? null],
-  );
+export async function storeRefreshToken({ userId, tokenHash, expiresAt, userAgent }) {
+  const doc = await RefreshToken.create({
+    userId,
+    tokenHash,
+    expiresAt: new Date(expiresAt),
+    userAgent: userAgent ?? null,
+  });
+  return doc._id.toString();
 }
 
-export const findRefreshToken = (tokenHash) =>
-  query.get('SELECT * FROM refresh_tokens WHERE token_hash = ?', [tokenHash]);
-
-export function revokeRefreshToken(tokenHash) {
-  query.run('UPDATE refresh_tokens SET revoked_at = ? WHERE token_hash = ? AND revoked_at IS NULL', [nowIso(), tokenHash]);
+export async function findRefreshToken(tokenHash) {
+  const doc = await RefreshToken.findOne({ tokenHash });
+  return doc && {
+    id: doc._id.toString(),
+    user_id: doc.userId.toString(),
+    token_hash: doc.tokenHash,
+    user_agent: doc.userAgent,
+    expires_at: doc.expiresAt.toISOString(),
+    revoked_at: doc.revokedAt ? doc.revokedAt.toISOString() : null,
+    created_at: doc.createdAt.toISOString(),
+  };
 }
 
-export function revokeAllRefreshTokens(userId) {
-  query.run('UPDATE refresh_tokens SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL', [nowIso(), userId]);
+export async function revokeRefreshToken(tokenHash) {
+  await RefreshToken.updateOne({ tokenHash, revokedAt: null }, { revokedAt: new Date() });
 }
 
-export function purgeExpiredRefreshTokens() {
-  return query.run('DELETE FROM refresh_tokens WHERE expires_at < ?', [nowIso()]).changes;
+export async function revokeAllRefreshTokens(userId) {
+  await RefreshToken.updateMany({ userId, revokedAt: null }, { revokedAt: new Date() });
+}
+
+export async function purgeExpiredRefreshTokens() {
+  const result = await RefreshToken.deleteMany({ expiresAt: { $lt: new Date() } });
+  return result.deletedCount;
 }

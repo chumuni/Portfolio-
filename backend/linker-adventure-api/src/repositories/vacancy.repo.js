@@ -1,119 +1,94 @@
-import { query, nowIso, fromBool } from '../db/index.js';
-import { parseList, serialiseList } from '../utils/json.js';
+import { Vacancy, Application } from '../db/models.js';
+import { escapeRegex } from '../utils/regex.js';
 
-const map = (row) => row && ({
-  id: row.id,
-  companyProfileId: row.company_profile_id,
-  title: row.title,
-  description: row.description,
-  destination: row.destination,
-  tourType: row.tour_type,
-  engagementType: row.engagement_type,
-  isRemote: Boolean(row.is_remote),
-  openings: row.openings,
-  tags: parseList(row.tags),
-  status: row.status,
-  closesAt: row.closes_at,
-  createdAt: row.created_at,
-  updatedAt: row.updated_at,
-  applicationCount: row.application_count ?? undefined,
-  ...(row.company_name ? { company: { id: row.company_profile_id, name: row.company_name, slug: row.company_slug, logoUrl: row.logo_path, city: row.city, country: row.country } } : {}),
-});
+function map(doc, applicationCount) {
+  if (!doc) return null;
+  const company = doc.companyProfileId && typeof doc.companyProfileId === 'object' ? doc.companyProfileId : null;
 
-const JOINED = `
-  SELECT v.*, co.company_name, co.slug AS company_slug, co.logo_path, co.city, co.country,
-         (SELECT COUNT(*) FROM applications a WHERE a.vacancy_id = v.id) AS application_count
-    FROM vacancies v
-    JOIN company_profiles co ON co.id = v.company_profile_id
-`;
+  return {
+    id: doc._id.toString(),
+    companyProfileId: (company ? company._id : doc.companyProfileId).toString(),
+    title: doc.title,
+    description: doc.description,
+    destination: doc.destination ?? null,
+    tourType: doc.tourType ?? null,
+    engagementType: doc.engagementType,
+    isRemote: Boolean(doc.isRemote),
+    openings: doc.openings,
+    tags: doc.tags ?? [],
+    status: doc.status,
+    closesAt: doc.closesAt ? doc.closesAt.toISOString() : null,
+    createdAt: doc.createdAt.toISOString(),
+    updatedAt: doc.updatedAt.toISOString(),
+    applicationCount,
+    ...(company ? { company: { id: company._id.toString(), name: company.companyName, slug: company.slug, logoUrl: company.logoPath ?? null, city: company.city ?? null, country: company.country ?? null } } : {}),
+  };
+}
 
-export const findById = (id) => map(query.get(`${JOINED} WHERE v.id = ?`, [id]));
+const populate = (query) => query.populate('companyProfileId', 'companyName slug logoPath city country');
 
-export function create(companyProfileId, input) {
-  const id = query.insert(
-    `INSERT INTO vacancies
-       (company_profile_id, title, description, destination, tour_type, engagement_type, is_remote, openings, tags, closes_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      companyProfileId,
-      input.title,
-      input.description,
-      input.destination ?? null,
-      input.tourType ?? null,
-      input.engagementType ?? 'contract',
-      fromBool(input.isRemote),
-      input.openings ?? 1,
-      serialiseList(input.tags),
-      input.closesAt ?? null,
-    ],
-  );
+async function withCount(doc) {
+  if (!doc) return null;
+  const count = await Application.countDocuments({ vacancyId: doc._id });
+  return map(doc, count);
+}
+
+export const findById = async (id) => withCount(await populate(Vacancy.findById(id)));
+
+export async function create(companyProfileId, input) {
+  const doc = await Vacancy.create({
+    companyProfileId,
+    title: input.title,
+    description: input.description,
+    destination: input.destination ?? null,
+    tourType: input.tourType ?? null,
+    engagementType: input.engagementType ?? 'contract',
+    isRemote: Boolean(input.isRemote),
+    openings: input.openings ?? 1,
+    tags: input.tags ?? [],
+    closesAt: input.closesAt ? new Date(input.closesAt) : null,
+  });
+  return findById(doc._id);
+}
+
+const FIELDS = ['title', 'description', 'destination', 'tourType', 'engagementType', 'openings', 'status'];
+
+export async function update(id, patch) {
+  const update = {};
+  for (const key of FIELDS) if (patch[key] !== undefined) update[key] = patch[key];
+  if (patch.isRemote !== undefined) update.isRemote = Boolean(patch.isRemote);
+  if (patch.tags !== undefined) update.tags = patch.tags;
+  if (patch.closesAt !== undefined) update.closesAt = patch.closesAt ? new Date(patch.closesAt) : null;
+  if (Object.keys(update).length > 0) await Vacancy.updateOne({ _id: id }, update);
   return findById(id);
 }
 
-const FIELDS = {
-  title: 'title',
-  description: 'description',
-  destination: 'destination',
-  tourType: 'tour_type',
-  engagementType: 'engagement_type',
-  openings: 'openings',
-  closesAt: 'closes_at',
-  status: 'status',
-};
-
-export function update(id, patch) {
-  const assignments = [];
-  const params = [];
-
-  for (const [key, column] of Object.entries(FIELDS)) {
-    if (patch[key] === undefined) continue;
-    assignments.push(`${column} = ?`);
-    params.push(patch[key]);
-  }
-  if (patch.isRemote !== undefined) {
-    assignments.push('is_remote = ?');
-    params.push(fromBool(patch.isRemote));
-  }
-  if (patch.tags !== undefined) {
-    assignments.push('tags = ?');
-    params.push(serialiseList(patch.tags));
-  }
-  if (assignments.length === 0) return findById(id);
-
-  assignments.push('updated_at = ?');
-  params.push(nowIso(), id);
-  query.run(`UPDATE vacancies SET ${assignments.join(', ')} WHERE id = ?`, params);
-  return findById(id);
+export async function remove(id) {
+  const result = await Vacancy.deleteOne({ _id: id });
+  return result.deletedCount > 0;
 }
 
-export function remove(id) {
-  return query.run('DELETE FROM vacancies WHERE id = ?', [id]).changes > 0;
-}
+export async function search(filters, { offset, perPage }) {
+  const where = {};
 
-export function search(filters, { offset, perPage }) {
-  const where = ['1 = 1'];
-  const params = [];
-
-  if (filters.q) {
-    const like = `%${filters.q.trim()}%`;
-    where.push('(v.title LIKE ? OR v.description LIKE ? OR v.tags LIKE ? OR co.company_name LIKE ?)');
-    params.push(like, like, like, like);
+  if (filters.q?.trim()) {
+    const regex = new RegExp(escapeRegex(filters.q.trim()), 'i');
+    where.$or = [{ title: regex }, { description: regex }, { tags: regex }];
   }
-  if (filters.status) { where.push('v.status = ?'); params.push(filters.status); }
-  if (filters.tourType) { where.push('v.tour_type = ?'); params.push(filters.tourType); }
-  if (filters.destination) { where.push('v.destination LIKE ?'); params.push(`%${filters.destination}%`); }
-  if (filters.engagementType) { where.push('v.engagement_type = ?'); params.push(filters.engagementType); }
-  if (filters.isRemote !== undefined) { where.push('v.is_remote = ?'); params.push(fromBool(filters.isRemote)); }
-  if (filters.companyProfileId) { where.push('v.company_profile_id = ?'); params.push(filters.companyProfileId); }
+  if (filters.status) where.status = filters.status;
+  if (filters.tourType) where.tourType = filters.tourType;
+  if (filters.destination) where.destination = new RegExp(escapeRegex(filters.destination), 'i');
+  if (filters.engagementType) where.engagementType = filters.engagementType;
+  if (filters.isRemote !== undefined) where.isRemote = Boolean(filters.isRemote);
+  if (filters.companyProfileId) where.companyProfileId = filters.companyProfileId;
 
-  const clause = where.join(' AND ');
-  const total = query.count(
-    `SELECT COUNT(*) FROM vacancies v JOIN company_profiles co ON co.id = v.company_profile_id WHERE ${clause}`,
-    params,
-  );
-  const rows = query.all(`${JOINED} WHERE ${clause} ORDER BY v.created_at DESC LIMIT ? OFFSET ?`, [...params, perPage, offset]);
-  return { items: rows.map(map), total };
+  const [total, docs] = await Promise.all([
+    Vacancy.countDocuments(where),
+    populate(Vacancy.find(where).sort({ createdAt: -1 }).skip(offset).limit(perPage)),
+  ]);
+  const items = await Promise.all(docs.map(withCount));
+  return { items, total };
 }
 
 export const countOpenForCompany = (companyProfileId) =>
-  query.count("SELECT COUNT(*) FROM vacancies WHERE company_profile_id = ? AND status = 'open'", [companyProfileId]);
+  Vacancy.countDocuments({ companyProfileId, status: 'open' });

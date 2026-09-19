@@ -7,8 +7,7 @@ function readBearer(req) {
   return header.startsWith('Bearer ') ? header.slice(7).trim() : null;
 }
 
-/** Rejects the request unless a valid access token is present. */
-export function authenticate(req, _res, next) {
+async function authenticateImpl(req, _res, next) {
   const token = readBearer(req);
   if (!token) return next(unauthorized('Missing bearer token'));
 
@@ -20,7 +19,7 @@ export function authenticate(req, _res, next) {
     return next(unauthorized(message));
   }
 
-  const user = userRepo.findById(Number(payload.sub));
+  const user = await userRepo.findById(payload.sub);
   if (!user) return next(unauthorized('Account no longer exists'));
   if (user.status !== 'active') return next(forbidden('Account is not active'));
 
@@ -28,16 +27,21 @@ export function authenticate(req, _res, next) {
   return next();
 }
 
-/** Attaches req.user when a token is present, but never blocks the request. */
-export function optionalAuth(req, _res, next) {
+async function optionalAuthImpl(req, _res, next) {
   const token = readBearer(req);
   if (!token) return next();
   try {
     const payload = verifyAccessToken(token);
-    const user = userRepo.findById(Number(payload.sub));
+    const user = await userRepo.findById(payload.sub);
     if (user && user.status === 'active') req.user = user;
   } catch {
     // An invalid token on a public route is simply ignored.
   }
   return next();
 }
+
+/** Rejects the request unless a valid access token is present. */
+export const authenticate = (req, res, next) => { authenticateImpl(req, res, next).catch(next); };
+
+/** Attaches req.user when a token is present, but never blocks the request. */
+export const optionalAuth = (req, res, next) => { optionalAuthImpl(req, res, next).catch(next); };

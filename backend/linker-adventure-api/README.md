@@ -2,22 +2,20 @@
 
 Backend for the B2B tourism matchmaking platform that connects **tour companies** with **tour agents**.
 
-Built on **Node.js 22 + Express**, with **`node:sqlite`** as the database — no native compilation, no external database server, deployable anywhere Node runs.
+Built on **Node.js 22 + Express**, with **MongoDB** (via Mongoose) as the database.
 
 ---
 
 ## Why this stack
 
-Your earlier build already settled on `node:sqlite` specifically to avoid native build failures on hosts like Render. That decision is preserved. What changed is the *structure* around it:
-
-| Before | Now |
+| Layer | Choice |
 | --- | --- |
-| SQL scattered through route handlers | All SQL isolated in `src/repositories/` |
-| Ad-hoc validation | `zod` schemas that strip and whitelist every input |
-| Mixed response shapes | One envelope: `{ success, data, meta }` / `{ success, error }` |
-| Schema created on boot | Versioned, append-only migrations |
-| JWT only | Access + rotating refresh tokens, stored hashed |
-| 5 tables | 12 tables covering credentials, vacancies, applications, reviews, notifications, analytics |
+| Data access | All queries isolated in `src/repositories/` — nothing above that layer knows it's MongoDB |
+| Validation | `zod` schemas that strip and whitelist every input |
+| Responses | One envelope: `{ success, data, meta }` / `{ success, error }` |
+| Schema | Mongoose models in `src/db/models.js`; indexes synced on boot |
+| Auth | Access + rotating refresh tokens, stored hashed |
+| Collections | 12, covering credentials, vacancies, applications, reviews, notifications, analytics |
 
 ---
 
@@ -26,26 +24,26 @@ Your earlier build already settled on `node:sqlite` specifically to avoid native
 Requests flow in one direction. Each layer has exactly one job.
 
 ```
-route  →  middleware  →  controller  →  service  →  repository  →  SQLite
-         (auth,          (HTTP in/out,  (business   (all SQL)
+route  →  middleware  →  controller  →  service  →  repository  →  MongoDB
+         (auth,          (HTTP in/out,  (business   (all queries)
           validation,     nothing else)  rules)
           rate limit)
 ```
 
 ```
 src/
-├── server.js                 Bootstrap: migrate, listen, graceful shutdown
+├── server.js                 Bootstrap: connect + sync indexes, listen, graceful shutdown
 ├── app.js                    Express assembly (helmet, cors, logging, routes)
 ├── routes.js                 Mounts every module under /api/v1
 ├── config/
 │   ├── env.js                Typed config, fails fast on missing secrets
 │   └── logger.js             Structured JSON logs in production
 ├── db/
-│   ├── index.js              Connection, query helpers, transactions
-│   ├── migrations.js         Append-only schema history
-│   ├── migrate.js            Versioned runner
-│   ├── seed.js               Realistic East African demo data
-│   └── reset.js              Drop and rebuild
+│   ├── index.js              Mongoose connection, transaction/id helpers
+│   ├── models.js             Every Mongoose schema/model (12 collections)
+│   ├── migrate.js            Syncs collection indexes (MongoDB is schemaless)
+│   ├── seed.js                Realistic East African demo data
+│   └── reset.js               Drop all collections
 ├── middleware/
 │   ├── authenticate.js       Bearer token → req.user (+ optionalAuth)
 │   ├── authorize.js          Role gate: authorize('company')
@@ -53,13 +51,13 @@ src/
 │   ├── upload.js             Multer: type + size limits, random filenames
 │   ├── rateLimiters.js       Global + stricter auth limiter
 │   └── errorHandler.js       Every error → one response shape
-├── repositories/             ← the ONLY place SQL is written
+├── repositories/             ← the ONLY place MongoDB/Mongoose is used
 ├── modules/                  ← one folder per domain
 │   └── <name>/{routes,controller,service,schema}.js
-└── utils/                    AppError, asyncHandler, pagination, tokens, slugs
+└── utils/                    AppError, asyncHandler, pagination, tokens, slugs, objectId
 ```
 
-**The rule worth keeping:** a controller never touches SQL, and a repository never throws HTTP errors. If you need a new feature, add a module — you won't have to touch the others.
+**The rule worth keeping:** a controller never touches Mongoose, and a repository never throws HTTP errors. If you need a new feature, add a module — you won't have to touch the others.
 
 ---
 
@@ -73,10 +71,16 @@ cp .env.example .env
 node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 # paste into JWT_ACCESS_SECRET and JWT_REFRESH_SECRET (different values)
 
-npm run db:migrate
+# set MONGODB_URI in .env to your MongoDB connection string
+# (a free MongoDB Atlas cluster works fine — get the string from Atlas → Connect → Drivers)
+
+npm run db:migrate   # syncs indexes — safe to run any time
 npm run db:seed      # optional demo data
 npm run dev          # http://localhost:3000/api/v1
 ```
+
+IDs returned by the API are MongoDB ObjectIds — 24-character hex strings — not
+numbers. Any client code expecting numeric ids needs updating.
 
 Verify the whole thing end-to-end:
 
@@ -183,17 +187,16 @@ Every result carries a `relationship` field so the UI knows whether to show
 ## Data model
 
 ```
-users ──┬── company_profiles ──┬── vacancies ── applications ── agent_profiles
-        │                      │                                     │
-        └── agent_profiles ────┴── connections ── messages           credentials
-                                        │
-                     reviews ───────────┘      notifications, profile_views
+users ──┬── companyProfiles ──┬── vacancies ── applications ── agentProfiles
+        │                     │                                     │
+        └── agentProfiles ────┴── connections ── messages           credentials
+                                       │
+                    reviews ───────────┘      notifications, profileViews
 ```
 
-Twelve tables. Arrays (tour types, languages, destinations) are stored as JSON
-text and filtered with indexed `LIKE` matching — the pragmatic choice for
-SQLite at this scale. If a list grows into a first-class entity with its own
-pages, promote it to a join table in a new migration.
+Twelve collections, defined in `src/db/models.js`. Arrays (tour types,
+languages, destinations) are native MongoDB array fields, filtered with `$in`
+— no JSON-text hacks needed.
 
 ---
 
@@ -202,7 +205,7 @@ pages, promote it to a join table in a new migration.
 - **Passwords**: bcrypt, 12 rounds, configurable. Login compares against a dummy hash when the user doesn't exist so response timing doesn't leak account existence.
 - **Refresh tokens**: stored as SHA-256 hashes and rotated on every use. A stolen-and-replayed token is rejected (the smoke test proves this).
 - **Input**: every body, query and param passes through a zod schema, and the parsed result *replaces* the raw input. Update schemas are `.strict()`, so a client cannot POST `isVerified: true` and promote itself.
-- **SQL**: every value is a bound parameter. No string interpolation of user input anywhere.
+- **Queries**: built with Mongoose's query builder — no raw/string-interpolated queries anywhere. Free-text search input is regex-escaped before use.
 - **Uploads**: MIME allow-list, size cap, random filenames — an uploaded `.php` or `.html` can never be executed or reflected under your origin.
 - **Rate limits**: global budget plus a tighter one on auth routes that only counts failures.
 - **Ownership**: checked in the service layer on every mutation, not just at the route.
@@ -238,10 +241,10 @@ product before wiring the API in, otherwise you'll rebuild the views twice.
 
 1. Push to GitHub, create a Web Service.
 2. Build `npm install`, start `npm start` (the `Procfile` is included).
-3. Set env vars from `.env.example` — real secrets, `NODE_ENV=production`, `CORS_ORIGINS=https://your-frontend`.
-4. Attach a **persistent disk** and point `DATABASE_FILE` and `UPLOAD_DIR` at it. Without a disk, Render's filesystem is ephemeral and your database vanishes on redeploy.
+3. Set env vars from `.env.example` — real secrets, `NODE_ENV=production`, `CORS_ORIGINS=https://your-frontend`, and `MONGODB_URI` pointing at your MongoDB Atlas cluster (Atlas is the easy path — no server to run yourself).
+4. Uploaded files (`UPLOAD_DIR`) still live on local disk — attach a **persistent disk** on Render, or move uploads to object storage (S3, R2, Cloudinary) before you rely on them in production, since Render's filesystem is ephemeral across redeploys.
 
-Migrations run automatically at boot, so a deploy applies any new ones for you.
+Index sync runs automatically at boot (`runMigrations()`), so a deploy picks up any new indexes for you.
 
 ---
 
@@ -250,4 +253,3 @@ Migrations run automatically at boot, so a deploy applies any new ones for you.
 1. **Tests.** The smoke test covers the happy paths; `node:test` unit tests around `connections.service.js` would lock in the matching rule.
 2. **Real-time messaging.** Swap polling for WebSockets once message volume justifies it.
 3. **Email.** Verification, password reset and match notifications — the notification rows are already being written.
-4. **Postgres.** If you outgrow SQLite (concurrent writes are the usual trigger), the repository layer is the only thing that changes. That isolation was the point.

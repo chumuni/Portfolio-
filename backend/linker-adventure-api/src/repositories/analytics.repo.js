@@ -1,59 +1,61 @@
-import { query } from '../db/index.js';
+import mongoose from 'mongoose';
+import { ProfileView, Notification } from '../db/models.js';
 
-export function recordProfileView({ subjectType, subjectId, viewerUserId }) {
-  query.insert(
-    'INSERT INTO profile_views (subject_type, subject_id, viewer_user_id) VALUES (?, ?, ?)',
-    [subjectType, subjectId, viewerUserId ?? null],
-  );
+export async function recordProfileView({ subjectType, subjectId, viewerUserId }) {
+  await ProfileView.create({ subjectType, subjectId, viewerUserId: viewerUserId ?? null });
 }
 
-export const countProfileViews = (subjectType, subjectId, sinceIso) => query.count(
-  `SELECT COUNT(*) FROM profile_views
-    WHERE subject_type = ? AND subject_id = ?${sinceIso ? ' AND viewed_at >= ?' : ''}`,
-  sinceIso ? [subjectType, subjectId, sinceIso] : [subjectType, subjectId],
-);
+export async function countProfileViews(subjectType, subjectId, sinceIso) {
+  const where = { subjectType, subjectId };
+  if (sinceIso) where.viewedAt = { $gte: new Date(sinceIso) };
+  return ProfileView.countDocuments(where);
+}
 
-export const viewsByDay = (subjectType, subjectId, sinceIso) => query.all(
-  `SELECT date(viewed_at) AS day, COUNT(*) AS count
-     FROM profile_views
-    WHERE subject_type = ? AND subject_id = ? AND viewed_at >= ?
-    GROUP BY day ORDER BY day`,
-  [subjectType, subjectId, sinceIso],
-).map((row) => ({ day: row.day, count: Number(row.count) }));
+export async function viewsByDay(subjectType, subjectId, sinceIso) {
+  const rows = await ProfileView.aggregate([
+    {
+      $match: {
+        subjectType,
+        subjectId: new mongoose.Types.ObjectId(subjectId),
+        viewedAt: { $gte: new Date(sinceIso) },
+      },
+    },
+    { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$viewedAt' } }, count: { $sum: 1 } } },
+    { $sort: { _id: 1 } },
+  ]);
+  return rows.map((row) => ({ day: row._id, count: row.count }));
+}
 
 /* ------------------------------ notifications ---------------------------- */
 
-const mapNotification = (row) => row && ({
-  id: row.id,
-  type: row.type,
-  title: row.title,
-  body: row.body,
-  payload: JSON.parse(row.payload ?? '{}'),
-  readAt: row.read_at,
-  createdAt: row.created_at,
+const mapNotification = (doc) => doc && ({
+  id: doc._id.toString(),
+  type: doc.type,
+  title: doc.title,
+  body: doc.body ?? null,
+  payload: doc.payload ?? {},
+  readAt: doc.readAt ? doc.readAt.toISOString() : null,
+  createdAt: doc.createdAt.toISOString(),
 });
 
-export function createNotification({ userId, type, title, body, payload }) {
-  query.insert(
-    'INSERT INTO notifications (user_id, type, title, body, payload) VALUES (?, ?, ?, ?, ?)',
-    [userId, type, title, body ?? null, JSON.stringify(payload ?? {})],
-  );
+export async function createNotification({ userId, type, title, body, payload }) {
+  await Notification.create({ userId, type, title, body: body ?? null, payload: payload ?? {} });
 }
 
-export function listNotifications(userId, { unreadOnly, offset, perPage }) {
-  const where = ['user_id = ?'];
-  const params = [userId];
-  if (unreadOnly) where.push('read_at IS NULL');
+export async function listNotifications(userId, { unreadOnly, offset, perPage }) {
+  const where = { userId };
+  if (unreadOnly) where.readAt = null;
 
-  const clause = where.join(' AND ');
-  const total = query.count(`SELECT COUNT(*) FROM notifications WHERE ${clause}`, params);
-  const rows = query.all(`SELECT * FROM notifications WHERE ${clause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-    [...params, perPage, offset]);
-  return { items: rows.map(mapNotification), total };
+  const [total, docs] = await Promise.all([
+    Notification.countDocuments(where),
+    Notification.find(where).sort({ createdAt: -1 }).skip(offset).limit(perPage),
+  ]);
+  return { items: docs.map(mapNotification), total };
 }
 
-export const countUnreadNotifications = (userId) =>
-  query.count('SELECT COUNT(*) FROM notifications WHERE user_id = ? AND read_at IS NULL', [userId]);
+export const countUnreadNotifications = (userId) => Notification.countDocuments({ userId, readAt: null });
 
-export const markNotificationsRead = (userId) =>
-  query.run("UPDATE notifications SET read_at = datetime('now') WHERE user_id = ? AND read_at IS NULL", [userId]).changes;
+export async function markNotificationsRead(userId) {
+  const result = await Notification.updateMany({ userId, readAt: null }, { readAt: new Date() });
+  return result.modifiedCount;
+}

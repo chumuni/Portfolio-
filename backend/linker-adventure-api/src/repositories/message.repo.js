@@ -1,46 +1,52 @@
-import { query, nowIso } from '../db/index.js';
+import { Message, Connection, CompanyProfile, AgentProfile } from '../db/models.js';
 
-const map = (row) => row && ({
-  id: row.id,
-  connectionId: row.connection_id,
-  senderUserId: row.sender_user_id,
-  body: row.body,
-  readAt: row.read_at,
-  createdAt: row.created_at,
+const map = (doc) => doc && ({
+  id: doc._id.toString(),
+  connectionId: doc.connectionId.toString(),
+  senderUserId: doc.senderUserId.toString(),
+  body: doc.body,
+  readAt: doc.readAt ? doc.readAt.toISOString() : null,
+  createdAt: doc.createdAt.toISOString(),
 });
 
-export function create({ connectionId, senderUserId, body }) {
-  const id = query.insert(
-    'INSERT INTO messages (connection_id, sender_user_id, body) VALUES (?, ?, ?)',
-    [connectionId, senderUserId, body],
+export async function create({ connectionId, senderUserId, body }) {
+  const doc = await Message.create({ connectionId, senderUserId, body });
+  return map(doc);
+}
+
+export async function listForConnection(connectionId, { offset, perPage }) {
+  const [total, docs] = await Promise.all([
+    Message.countDocuments({ connectionId }),
+    Message.find({ connectionId }).sort({ createdAt: -1, _id: -1 }).skip(offset).limit(perPage),
+  ]);
+  return { items: docs.map(map).reverse(), total };
+}
+
+export async function markRead(connectionId, readerUserId) {
+  const result = await Message.updateMany(
+    { connectionId, senderUserId: { $ne: readerUserId }, readAt: null },
+    { readAt: new Date() },
   );
-  return map(query.get('SELECT * FROM messages WHERE id = ?', [id]));
+  return result.modifiedCount;
 }
 
-export function listForConnection(connectionId, { offset, perPage }) {
-  const total = query.count('SELECT COUNT(*) FROM messages WHERE connection_id = ?', [connectionId]);
-  const rows = query.all(
-    'SELECT * FROM messages WHERE connection_id = ? ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?',
-    [connectionId, perPage, offset],
-  );
-  return { items: rows.map(map).reverse(), total };
-}
+export async function countUnreadForUser(userId) {
+  const [company, agent] = await Promise.all([
+    CompanyProfile.findOne({ userId }).select('_id'),
+    AgentProfile.findOne({ userId }).select('_id'),
+  ]);
 
-export function markRead(connectionId, readerUserId) {
-  return query.run(
-    'UPDATE messages SET read_at = ? WHERE connection_id = ? AND sender_user_id != ? AND read_at IS NULL',
-    [nowIso(), connectionId, readerUserId],
-  ).changes;
-}
+  const or = [];
+  if (company) or.push({ companyProfileId: company._id });
+  if (agent) or.push({ agentProfileId: agent._id });
+  if (or.length === 0) return 0;
 
-export const countUnreadForUser = (userId) => query.count(
-  `SELECT COUNT(*)
-     FROM messages m
-     JOIN connections c ON c.id = m.connection_id
-     LEFT JOIN company_profiles co ON co.id = c.company_profile_id
-     LEFT JOIN agent_profiles  ag ON ag.id = c.agent_profile_id
-    WHERE m.read_at IS NULL
-      AND m.sender_user_id != ?
-      AND (co.user_id = ? OR ag.user_id = ?)`,
-  [userId, userId, userId],
-);
+  const connectionIds = await Connection.find({ $or: or }).distinct('_id');
+  if (connectionIds.length === 0) return 0;
+
+  return Message.countDocuments({
+    connectionId: { $in: connectionIds },
+    senderUserId: { $ne: userId },
+    readAt: null,
+  });
+}

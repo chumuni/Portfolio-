@@ -1,69 +1,65 @@
-import { query, nowIso } from '../db/index.js';
+import { Application, Vacancy } from '../db/models.js';
 
-const map = (row) => row && ({
-  id: row.id,
-  vacancyId: row.vacancy_id,
-  agentProfileId: row.agent_profile_id,
-  coverLetter: row.cover_letter,
-  status: row.status,
-  createdAt: row.created_at,
-  updatedAt: row.updated_at,
-  ...(row.title ? { vacancy: { id: row.vacancy_id, title: row.title, companyProfileId: row.company_profile_id, companyName: row.company_name } } : {}),
-  ...(row.full_name ? { agent: { id: row.agent_profile_id, name: row.full_name, slug: row.agent_slug, photoUrl: row.photo_path, headline: row.headline, yearsExperience: row.years_experience } } : {}),
-});
+function map(doc) {
+  if (!doc) return null;
+  const vacancy = doc.vacancyId && typeof doc.vacancyId === 'object' ? doc.vacancyId : null;
+  const agent = doc.agentProfileId && typeof doc.agentProfileId === 'object' ? doc.agentProfileId : null;
 
-const JOINED = `
-  SELECT a.*, v.title, v.company_profile_id, co.company_name,
-         ag.full_name, ag.slug AS agent_slug, ag.photo_path, ag.headline, ag.years_experience
-    FROM applications a
-    JOIN vacancies v ON v.id = a.vacancy_id
-    JOIN company_profiles co ON co.id = v.company_profile_id
-    JOIN agent_profiles ag ON ag.id = a.agent_profile_id
-`;
+  return {
+    id: doc._id.toString(),
+    vacancyId: (vacancy ? vacancy._id : doc.vacancyId).toString(),
+    agentProfileId: (agent ? agent._id : doc.agentProfileId).toString(),
+    coverLetter: doc.coverLetter ?? null,
+    status: doc.status,
+    createdAt: doc.createdAt.toISOString(),
+    updatedAt: doc.updatedAt.toISOString(),
+    ...(vacancy ? { vacancy: { id: vacancy._id.toString(), title: vacancy.title, companyProfileId: vacancy.companyProfileId.toString() } } : {}),
+    ...(agent ? { agent: { id: agent._id.toString(), name: agent.fullName, slug: agent.slug, photoUrl: agent.photoPath ?? null, headline: agent.headline ?? null, yearsExperience: agent.yearsExperience } } : {}),
+  };
+}
 
-export const findById = (id) => map(query.get(`${JOINED} WHERE a.id = ?`, [id]));
+const populate = (query) => query
+  .populate('vacancyId', 'title companyProfileId')
+  .populate('agentProfileId', 'fullName slug photoPath headline yearsExperience');
 
-export const findExisting = (vacancyId, agentProfileId) =>
-  map(query.get(`${JOINED} WHERE a.vacancy_id = ? AND a.agent_profile_id = ?`, [vacancyId, agentProfileId]));
+export const findById = async (id) => map(await populate(Application.findById(id)));
 
-export function create({ vacancyId, agentProfileId, coverLetter }) {
-  const id = query.insert(
-    'INSERT INTO applications (vacancy_id, agent_profile_id, cover_letter) VALUES (?, ?, ?)',
-    [vacancyId, agentProfileId, coverLetter ?? null],
-  );
+export const findExisting = async (vacancyId, agentProfileId) =>
+  map(await populate(Application.findOne({ vacancyId, agentProfileId })));
+
+export async function create({ vacancyId, agentProfileId, coverLetter }) {
+  const doc = await Application.create({ vacancyId, agentProfileId, coverLetter: coverLetter ?? null });
+  return findById(doc._id);
+}
+
+export async function setStatus(id, status) {
+  await Application.updateOne({ _id: id }, { status });
   return findById(id);
 }
 
-export function setStatus(id, status) {
-  query.run('UPDATE applications SET status = ?, updated_at = ? WHERE id = ?', [status, nowIso(), id]);
-  return findById(id);
+export async function listForVacancy(vacancyId, { status, offset, perPage }) {
+  const where = { vacancyId };
+  if (status) where.status = status;
+  const [total, docs] = await Promise.all([
+    Application.countDocuments(where),
+    populate(Application.find(where).sort({ createdAt: -1 }).skip(offset).limit(perPage)),
+  ]);
+  return { items: docs.map(map), total };
 }
 
-export function listForVacancy(vacancyId, { status, offset, perPage }) {
-  const where = ['a.vacancy_id = ?'];
-  const params = [vacancyId];
-  if (status) { where.push('a.status = ?'); params.push(status); }
-
-  const clause = where.join(' AND ');
-  const total = query.count(`SELECT COUNT(*) FROM applications a WHERE ${clause}`, params);
-  const rows = query.all(`${JOINED} WHERE ${clause} ORDER BY a.created_at DESC LIMIT ? OFFSET ?`, [...params, perPage, offset]);
-  return { items: rows.map(map), total };
+export async function listForAgent(agentProfileId, { status, offset, perPage }) {
+  const where = { agentProfileId };
+  if (status) where.status = status;
+  const [total, docs] = await Promise.all([
+    Application.countDocuments(where),
+    populate(Application.find(where).sort({ createdAt: -1 }).skip(offset).limit(perPage)),
+  ]);
+  return { items: docs.map(map), total };
 }
 
-export function listForAgent(agentProfileId, { status, offset, perPage }) {
-  const where = ['a.agent_profile_id = ?'];
-  const params = [agentProfileId];
-  if (status) { where.push('a.status = ?'); params.push(status); }
-
-  const clause = where.join(' AND ');
-  const total = query.count(`SELECT COUNT(*) FROM applications a WHERE ${clause}`, params);
-  const rows = query.all(`${JOINED} WHERE ${clause} ORDER BY a.created_at DESC LIMIT ? OFFSET ?`, [...params, perPage, offset]);
-  return { items: rows.map(map), total };
+export async function countForCompany(companyProfileId, status) {
+  const vacancyIds = await Vacancy.find({ companyProfileId }).distinct('_id');
+  const where = { vacancyId: { $in: vacancyIds } };
+  if (status) where.status = status;
+  return Application.countDocuments(where);
 }
-
-export const countForCompany = (companyProfileId, status) => query.count(
-  `SELECT COUNT(*) FROM applications a
-     JOIN vacancies v ON v.id = a.vacancy_id
-    WHERE v.company_profile_id = ?${status ? ' AND a.status = ?' : ''}`,
-  status ? [companyProfileId, status] : [companyProfileId],
-);

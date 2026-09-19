@@ -1,4 +1,5 @@
 import multer from 'multer';
+import mongoose from 'mongoose';
 import { config } from '../config/env.js';
 import { logger } from '../config/logger.js';
 import { AppError } from '../utils/AppError.js';
@@ -17,10 +18,19 @@ export function errorHandler(error, req, res, _next) {
     status = error.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
     code = error.code;
     message = error.code === 'LIMIT_FILE_SIZE' ? 'File is larger than the allowed limit' : error.message;
-  } else if (error?.code === 'SQLITE_CONSTRAINT_UNIQUE' || /UNIQUE constraint failed/.test(error?.message ?? '')) {
+  } else if (error?.code === 11000) {
+    // MongoDB duplicate key error (e.g. an email or slug that already exists).
     status = 409;
     code = 'CONFLICT';
     message = 'That record already exists';
+  } else if (error instanceof mongoose.Error.CastError) {
+    status = 400;
+    code = 'INVALID_ID';
+    message = 'That id is not valid';
+  } else if (error instanceof mongoose.Error.ValidationError) {
+    status = 400;
+    code = 'VALIDATION_ERROR';
+    message = error.message;
   } else if (error?.type === 'entity.parse.failed') {
     status = 400;
     code = 'INVALID_JSON';

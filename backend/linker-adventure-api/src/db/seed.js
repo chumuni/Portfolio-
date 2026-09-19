@@ -1,4 +1,5 @@
-import { closeDb, query } from './index.js';
+import { closeDb, connectDb } from './index.js';
+import { User } from './models.js';
 import { runMigrations } from './migrate.js';
 import { logger } from '../config/logger.js';
 import * as userRepo from '../repositories/user.repo.js';
@@ -7,7 +8,7 @@ import * as connectionRepo from '../repositories/connection.repo.js';
 import * as vacancyRepo from '../repositories/vacancy.repo.js';
 import * as reviewRepo from '../repositories/review.repo.js';
 import * as credentialRepo from '../repositories/credential.repo.js';
-import { hashPasswordSync } from '../utils/password.js';
+import { hashPassword } from '../utils/password.js';
 
 const DEMO_PASSWORD = 'Passw0rd!';
 
@@ -101,39 +102,38 @@ const AGENTS = [
   },
 ];
 
-function isAlreadySeeded() {
-  return query.count('SELECT COUNT(*) FROM users') > 0;
-}
+async function seed() {
+  await connectDb();
+  await runMigrations();
 
-function seed() {
-  runMigrations();
-
-  if (isAlreadySeeded()) {
+  if ((await User.countDocuments()) > 0) {
     logger.warn('Database already contains users — skipping seed. Run `npm run db:reset` first to reseed.');
     return;
   }
 
-  const passwordHash = hashPasswordSync(DEMO_PASSWORD);
+  const passwordHash = await hashPassword(DEMO_PASSWORD);
 
-  const companies = COMPANIES.map((input) => {
-    const user = userRepo.create({ email: input.email, passwordHash, role: 'company' });
-    const profile = profileRepo.createCompanyProfile(user.id, input);
-    return profileRepo.updateCompanyProfile(profile.id, { isRecruiting: input.isRecruiting ?? false });
-  });
+  const companies = [];
+  for (const input of COMPANIES) {
+    const user = await userRepo.create({ email: input.email, passwordHash, role: 'company' });
+    const profile = await profileRepo.createCompanyProfile(user.id, input);
+    companies.push(await profileRepo.updateCompanyProfile(profile.id, { isRecruiting: input.isRecruiting ?? false }));
+  }
 
-  const agents = AGENTS.map((input) => {
-    const user = userRepo.create({ email: input.email, passwordHash, role: 'agent' });
-    return profileRepo.createAgentProfile(user.id, input);
-  });
+  const agents = [];
+  for (const input of AGENTS) {
+    const user = await userRepo.create({ email: input.email, passwordHash, role: 'agent' });
+    agents.push(await profileRepo.createAgentProfile(user.id, input));
+  }
 
-  credentialRepo.create(agents[0].id, {
+  await credentialRepo.create(agents[0].id, {
     title: 'Certified Tourism Professional (CTP)',
     issuer: 'Global Travel Association',
     credentialType: 'certificate',
     issuedAt: '2022-01-15',
     expiresAt: '2026-01-15',
   });
-  credentialRepo.create(agents[1].id, {
+  await credentialRepo.create(agents[1].id, {
     title: 'Wilderness First Responder',
     issuer: 'NOLS',
     credentialType: 'training',
@@ -141,23 +141,23 @@ function seed() {
   });
 
   // A fully matched pair, plus a one-sided pending one to show the gate working.
-  const matched = connectionRepo.create({
+  const matched = await connectionRepo.create({
     companyProfileId: companies[0].id,
     agentProfileId: agents[0].id,
     initiatedBy: 'company',
     note: 'Your luxury client base is a strong fit for our private migration departures.',
   });
-  connectionRepo.setInterest(matched.id, 'agent', true);
-  connectionRepo.markMatched(matched.id);
+  await connectionRepo.setInterest(matched.id, 'agent', true);
+  await connectionRepo.markMatched(matched.id);
 
-  connectionRepo.create({
+  await connectionRepo.create({
     companyProfileId: companies[1].id,
     agentProfileId: agents[3].id,
     initiatedBy: 'agent',
     note: 'Interested in your dhow charters for a 30-person incentive group.',
   });
 
-  vacancyRepo.create(companies[0].id, {
+  await vacancyRepo.create(companies[0].id, {
     title: 'European Market Agent — Migration Season',
     description: 'We are looking for agents with an established European client base to sell our June–October migration departures. Commission-based, with familiarisation trip included.',
     destination: 'Serengeti',
@@ -167,7 +167,7 @@ function seed() {
     openings: 3,
     tags: ['Safari', 'Europe', 'Commission'],
   });
-  vacancyRepo.create(companies[1].id, {
+  await vacancyRepo.create(companies[1].id, {
     title: 'Beach and Diving Specialist Agent',
     description: 'Represent our Zanzibar reef and dhow programmes in the Gulf and East Asian markets. Training on our full product line provided.',
     destination: 'Zanzibar',
@@ -178,7 +178,7 @@ function seed() {
     tags: ['Beach', 'Diving'],
   });
 
-  reviewRepo.create({
+  await reviewRepo.create({
     subjectType: 'company', subjectId: companies[0].id,
     authorUserId: agents[0].userId, connectionId: matched.id,
     kind: 'partner', rating: 5,
@@ -186,13 +186,14 @@ function seed() {
     body: 'Three seasons of bookings without a single service failure. Quotes come back within hours and their guides are consistently praised by my clients.',
     reviewerName: 'Amina Hassan', reviewerRole: 'Luxury Safari Specialist',
   });
-  reviewRepo.create({
+  await reviewRepo.create({
     subjectType: 'company', subjectId: companies[0].id,
     kind: 'tourist', rating: 5,
     body: 'Our seven-day migration safari was flawless from airport pickup to the final camp. The guiding made the trip.',
     reviewerName: 'Elena Rodriguez', referredBy: 'Amina Hassan',
   });
-  profileRepo.applyRating('company', companies[0].id, reviewRepo.aggregateForSubject('company', companies[0].id));
+  const aggregate = await reviewRepo.aggregateForSubject('company', companies[0].id);
+  await profileRepo.applyRating('company', companies[0].id, aggregate);
 
   logger.info('Seed complete', {
     companies: companies.length,
@@ -203,5 +204,10 @@ function seed() {
   });
 }
 
-seed();
-closeDb();
+seed()
+  .then(closeDb)
+  .catch(async (error) => {
+    logger.error(`Seed failed: ${error.message}`);
+    await closeDb();
+    process.exit(1);
+  });

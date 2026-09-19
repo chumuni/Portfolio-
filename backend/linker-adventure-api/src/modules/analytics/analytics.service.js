@@ -10,42 +10,51 @@ import { notFound } from '../../utils/AppError.js';
 const daysAgoIso = (days) => new Date(Date.now() - days * 86_400_000).toISOString();
 
 /** Backs the "Your Dashboard" panel: views, matches, pipeline, unread. */
-export function dashboard(user, { days = 30 } = {}) {
+export async function dashboard(user, { days = 30 } = {}) {
   const since = daysAgoIso(days);
   const subjectType = user.role;
 
   const profile = subjectType === 'company'
-    ? profileRepo.findCompanyByUserId(user.id)
-    : profileRepo.findAgentByUserId(user.id);
+    ? await profileRepo.findCompanyByUserId(user.id)
+    : await profileRepo.findAgentByUserId(user.id);
   if (!profile) throw notFound('Profile not found');
+
+  const [
+    viewsTotal, viewsWindow, viewsByDay,
+    pending, matched, declined,
+    unreadMessages, unreadNotifications,
+  ] = await Promise.all([
+    analyticsRepo.countProfileViews(subjectType, profile.id),
+    analyticsRepo.countProfileViews(subjectType, profile.id, since),
+    analyticsRepo.viewsByDay(subjectType, profile.id, since),
+    connectionRepo.countByStatus(subjectType, profile.id, 'pending'),
+    connectionRepo.countByStatus(subjectType, profile.id, 'matched'),
+    connectionRepo.countByStatus(subjectType, profile.id, 'declined'),
+    messageRepo.countUnreadForUser(user.id),
+    analyticsRepo.countUnreadNotifications(user.id),
+  ]);
 
   const common = {
     period: { days, since },
-    profileViews: {
-      total: analyticsRepo.countProfileViews(subjectType, profile.id),
-      window: analyticsRepo.countProfileViews(subjectType, profile.id, since),
-      byDay: analyticsRepo.viewsByDay(subjectType, profile.id, since),
-    },
-    connections: {
-      pending: connectionRepo.countByStatus(subjectType, profile.id, 'pending'),
-      matched: connectionRepo.countByStatus(subjectType, profile.id, 'matched'),
-      declined: connectionRepo.countByStatus(subjectType, profile.id, 'declined'),
-    },
+    profileViews: { total: viewsTotal, window: viewsWindow, byDay: viewsByDay },
+    connections: { pending, matched, declined },
     rating: profile.rating,
-    unreadMessages: messageRepo.countUnreadForUser(user.id),
-    unreadNotifications: analyticsRepo.countUnreadNotifications(user.id),
+    unreadMessages,
+    unreadNotifications,
   };
 
   if (subjectType === 'company') {
+    const [open, total, submitted, shortlisted, accepted] = await Promise.all([
+      vacancyRepo.countOpenForCompany(profile.id),
+      applicationRepo.countForCompany(profile.id),
+      applicationRepo.countForCompany(profile.id, 'submitted'),
+      applicationRepo.countForCompany(profile.id, 'shortlisted'),
+      applicationRepo.countForCompany(profile.id, 'accepted'),
+    ]);
     return {
       ...common,
-      vacancies: { open: vacancyRepo.countOpenForCompany(profile.id) },
-      applications: {
-        total: applicationRepo.countForCompany(profile.id),
-        submitted: applicationRepo.countForCompany(profile.id, 'submitted'),
-        shortlisted: applicationRepo.countForCompany(profile.id, 'shortlisted'),
-        accepted: applicationRepo.countForCompany(profile.id, 'accepted'),
-      },
+      vacancies: { open },
+      applications: { total, submitted, shortlisted, accepted },
       isRecruiting: profile.isRecruiting,
     };
   }
@@ -57,14 +66,13 @@ export function dashboard(user, { days = 30 } = {}) {
   };
 }
 
-export function listNotifications(user, filters) {
+export async function listNotifications(user, filters) {
   const { page, perPage, offset } = parsePagination(filters);
-  const { items, total } = analyticsRepo.listNotifications(user.id, {
-    unreadOnly: filters.unreadOnly === true,
-    offset,
-    perPage,
-  });
-  return { items, meta: { page, perPage, total, unread: analyticsRepo.countUnreadNotifications(user.id) } };
+  const [{ items, total }, unread] = await Promise.all([
+    analyticsRepo.listNotifications(user.id, { unreadOnly: filters.unreadOnly === true, offset, perPage }),
+    analyticsRepo.countUnreadNotifications(user.id),
+  ]);
+  return { items, meta: { page, perPage, total, unread } };
 }
 
-export const markNotificationsRead = (user) => ({ updated: analyticsRepo.markNotificationsRead(user.id) });
+export const markNotificationsRead = async (user) => ({ updated: await analyticsRepo.markNotificationsRead(user.id) });

@@ -1,8 +1,9 @@
 import { z } from 'zod';
+import { objectId } from '../../utils/objectId.js';
 
 export const createReviewSchema = z.object({
   subjectType: z.enum(['company', 'agent']),
-  subjectId: z.coerce.number().int().positive(),
+  subjectId: objectId,
   kind: z.enum(['partner', 'tourist']).optional(),
   rating: z.coerce.number().int().min(1).max(5),
   title: z.string().trim().max(150).optional(),
@@ -20,5 +21,5 @@ export const listReviewsSchema = z.object({
 
 export const subjectParamSchema = z.object({
   subjectType: z.enum(['company', 'agent']),
-  subjectId: z.coerce.number().int().positive(),
+  subjectId: objectId,
 });

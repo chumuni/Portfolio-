@@ -1,89 +1,77 @@
-import { query, nowIso } from '../db/index.js';
+import { Connection } from '../db/models.js';
 
-const map = (row) => row && ({
-  id: row.id,
-  companyProfileId: row.company_profile_id,
-  agentProfileId: row.agent_profile_id,
-  initiatedBy: row.initiated_by,
-  companyInterested: Boolean(row.company_interested),
-  agentInterested: Boolean(row.agent_interested),
-  status: row.status,
-  note: row.note,
-  matchedAt: row.matched_at,
-  createdAt: row.created_at,
-  updatedAt: row.updated_at,
-  ...(row.company_name ? { company: { id: row.company_profile_id, name: row.company_name, slug: row.company_slug, logoUrl: row.logo_path } } : {}),
-  ...(row.full_name ? { agent: { id: row.agent_profile_id, name: row.full_name, slug: row.agent_slug, photoUrl: row.photo_path, headline: row.headline } } : {}),
-});
+function map(doc) {
+  if (!doc) return null;
+  const company = doc.companyProfileId && typeof doc.companyProfileId === 'object' ? doc.companyProfileId : null;
+  const agent = doc.agentProfileId && typeof doc.agentProfileId === 'object' ? doc.agentProfileId : null;
 
-const JOINED = `
-  SELECT c.*,
-         co.company_name, co.slug AS company_slug, co.logo_path,
-         ag.full_name, ag.slug AS agent_slug, ag.photo_path, ag.headline
-    FROM connections c
-    JOIN company_profiles co ON co.id = c.company_profile_id
-    JOIN agent_profiles  ag ON ag.id = c.agent_profile_id
-`;
+  return {
+    id: doc._id.toString(),
+    companyProfileId: (company ? company._id : doc.companyProfileId).toString(),
+    agentProfileId: (agent ? agent._id : doc.agentProfileId).toString(),
+    initiatedBy: doc.initiatedBy,
+    companyInterested: Boolean(doc.companyInterested),
+    agentInterested: Boolean(doc.agentInterested),
+    status: doc.status,
+    note: doc.note ?? null,
+    matchedAt: doc.matchedAt ? doc.matchedAt.toISOString() : null,
+    createdAt: doc.createdAt.toISOString(),
+    updatedAt: doc.updatedAt.toISOString(),
+    ...(company ? { company: { id: company._id.toString(), name: company.companyName, slug: company.slug, logoUrl: company.logoPath ?? null } } : {}),
+    ...(agent ? { agent: { id: agent._id.toString(), name: agent.fullName, slug: agent.slug, photoUrl: agent.photoPath ?? null, headline: agent.headline ?? null } } : {}),
+  };
+}
 
-export const findById = (id) => map(query.get(`${JOINED} WHERE c.id = ?`, [id]));
+const populate = (query) => query
+  .populate('companyProfileId', 'companyName slug logoPath')
+  .populate('agentProfileId', 'fullName slug photoPath headline');
 
-export const findPair = (companyProfileId, agentProfileId) =>
-  map(query.get(`${JOINED} WHERE c.company_profile_id = ? AND c.agent_profile_id = ?`, [companyProfileId, agentProfileId]));
+export const findById = async (id) => map(await populate(Connection.findById(id)));
 
-export function create({ companyProfileId, agentProfileId, initiatedBy, note }) {
-  const id = query.insert(
-    `INSERT INTO connections
-       (company_profile_id, agent_profile_id, initiated_by, company_interested, agent_interested, note)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [
-      companyProfileId,
-      agentProfileId,
-      initiatedBy,
-      initiatedBy === 'company' ? 1 : 0,
-      initiatedBy === 'agent' ? 1 : 0,
-      note ?? null,
-    ],
-  );
+export const findPair = async (companyProfileId, agentProfileId) =>
+  map(await populate(Connection.findOne({ companyProfileId, agentProfileId })));
+
+export async function create({ companyProfileId, agentProfileId, initiatedBy, note }) {
+  const doc = await Connection.create({
+    companyProfileId,
+    agentProfileId,
+    initiatedBy,
+    companyInterested: initiatedBy === 'company',
+    agentInterested: initiatedBy === 'agent',
+    note: note ?? null,
+  });
+  return findById(doc._id);
+}
+
+export async function setInterest(id, side, interested) {
+  const field = side === 'company' ? 'companyInterested' : 'agentInterested';
+  await Connection.updateOne({ _id: id }, { [field]: interested });
   return findById(id);
 }
 
-export function setInterest(id, side, interested) {
-  const column = side === 'company' ? 'company_interested' : 'agent_interested';
-  query.run(`UPDATE connections SET ${column} = ?, updated_at = ? WHERE id = ?`, [interested ? 1 : 0, nowIso(), id]);
+export async function markMatched(id) {
+  await Connection.updateOne({ _id: id }, { status: 'matched', matchedAt: new Date() });
   return findById(id);
 }
 
-export function markMatched(id) {
-  query.run('UPDATE connections SET status = ?, matched_at = ?, updated_at = ? WHERE id = ?',
-    ['matched', nowIso(), nowIso(), id]);
+export async function setStatus(id, status) {
+  await Connection.updateOne({ _id: id }, { status });
   return findById(id);
 }
 
-export function setStatus(id, status) {
-  query.run('UPDATE connections SET status = ?, updated_at = ? WHERE id = ?', [status, nowIso(), id]);
-  return findById(id);
+export async function listForProfile({ profileType, profileId, status, offset, perPage }) {
+  const field = profileType === 'company' ? 'companyProfileId' : 'agentProfileId';
+  const where = { [field]: profileId };
+  if (status) where.status = status;
+
+  const [total, docs] = await Promise.all([
+    Connection.countDocuments(where),
+    populate(Connection.find(where).sort({ updatedAt: -1 }).skip(offset).limit(perPage)),
+  ]);
+  return { items: docs.map(map), total };
 }
 
-export function listForProfile({ profileType, profileId, status, offset, perPage }) {
-  const column = profileType === 'company' ? 'c.company_profile_id' : 'c.agent_profile_id';
-  const where = [`${column} = ?`];
-  const params = [profileId];
-
-  if (status) {
-    where.push('c.status = ?');
-    params.push(status);
-  }
-
-  const clause = where.join(' AND ');
-  const total = query.count(`SELECT COUNT(*) FROM connections c WHERE ${clause}`, params);
-  const rows = query.all(
-    `${JOINED} WHERE ${clause} ORDER BY c.updated_at DESC LIMIT ? OFFSET ?`,
-    [...params, perPage, offset],
-  );
-  return { items: rows.map(map), total };
+export async function countByStatus(profileType, profileId, status) {
+  const field = profileType === 'company' ? 'companyProfileId' : 'agentProfileId';
+  return Connection.countDocuments({ [field]: profileId, status });
 }
-
-export const countByStatus = (profileType, profileId, status) => {
-  const column = profileType === 'company' ? 'company_profile_id' : 'agent_profile_id';
-  return query.count(`SELECT COUNT(*) FROM connections WHERE ${column} = ? AND status = ?`, [profileId, status]);
-};

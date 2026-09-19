@@ -1,75 +1,38 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { DatabaseSync } from 'node:sqlite';
+import mongoose from 'mongoose';
 import { config } from '../config/env.js';
 import { logger } from '../config/logger.js';
 
-let instance = null;
+let connectPromise = null;
 
-/**
- * Single shared connection. node:sqlite is synchronous, so a connection pool
- * buys nothing — one handle per process is the correct shape.
- */
-export function getDb() {
-  if (instance) return instance;
+/** Single shared connection, memoised so repeated calls are free. */
+export function connectDb() {
+  if (connectPromise) return connectPromise;
 
-  fs.mkdirSync(path.dirname(config.db.file), { recursive: true });
-  instance = new DatabaseSync(config.db.file);
+  mongoose.set('strictQuery', true);
+  connectPromise = mongoose
+    .connect(config.db.uri, config.db.name ? { dbName: config.db.name } : undefined)
+    .then((conn) => {
+      logger.info('MongoDB connection opened', {
+        host: conn.connection.host,
+        db: conn.connection.name,
+      });
+      return conn.connection;
+    })
+    .catch((error) => {
+      connectPromise = null;
+      throw error;
+    });
 
-  instance.exec('PRAGMA journal_mode = WAL');
-  instance.exec('PRAGMA foreign_keys = ON');
-  instance.exec('PRAGMA busy_timeout = 5000');
-
-  logger.info('SQLite connection opened', { file: config.db.file });
-  return instance;
+  return connectPromise;
 }
 
-export function closeDb() {
-  if (!instance) return;
-  instance.close();
-  instance = null;
+export async function closeDb() {
+  if (!connectPromise) return;
+  await mongoose.disconnect();
+  connectPromise = null;
 }
 
-/** Rows as plain objects (node:sqlite returns null-prototype objects). */
-const plain = (row) => (row ? { ...row } : row);
-
-export const query = {
-  all(sql, params = []) {
-    return getDb().prepare(sql).all(...params).map(plain);
-  },
-  get(sql, params = []) {
-    return plain(getDb().prepare(sql).get(...params)) ?? null;
-  },
-  run(sql, params = []) {
-    const result = getDb().prepare(sql).run(...params);
-    return { changes: Number(result.changes), lastInsertRowid: Number(result.lastInsertRowid) };
-  },
-  /** Insert and return the created row id. */
-  insert(sql, params = []) {
-    return this.run(sql, params).lastInsertRowid;
-  },
-  /** Scalar helper for COUNT(*) style queries. */
-  count(sql, params = []) {
-    const row = this.get(sql, params);
-    return row ? Number(Object.values(row)[0]) : 0;
-  },
-};
-
-/** Run a unit of work atomically. Throwing inside the callback rolls back. */
-export function transaction(work) {
-  const db = getDb();
-  db.exec('BEGIN');
-  try {
-    const result = work();
-    db.exec('COMMIT');
-    return result;
-  } catch (error) {
-    db.exec('ROLLBACK');
-    throw error;
-  }
-}
-
-/** SQLite stores booleans as integers; keep the conversion in one place. */
-export const toBool = (value) => value === 1 || value === true;
-export const fromBool = (value) => (value ? 1 : 0);
 export const nowIso = () => new Date().toISOString();
+
+/** True when the value can be used as a MongoDB ObjectId (route params are pre-validated by zod; this guards internal lookups, e.g. an id decoded from a JWT). */
+export const isValidId = (id) => mongoose.isValidObjectId(id);

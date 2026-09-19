@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import { objectId } from '../../utils/objectId.js';
 
 export const expressInterestSchema = z.object({
-  targetProfileId: z.coerce.number().int().positive(),
+  targetProfileId: objectId,
   note: z.string().trim().max(500).optional(),
 });
 
@@ -11,4 +12,4 @@ export const listConnectionsSchema = z.object({
   perPage: z.coerce.number().int().min(1).max(50).optional(),
 });
 
-export const idParamSchema = z.object({ id: z.coerce.number().int().positive() });
+export const idParamSchema = z.object({ id: objectId });

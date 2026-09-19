@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { objectId } from '../../utils/objectId.js';
 
 const bool = z.preprocess((value) => {
   if (value === undefined || value === '') return undefined;
@@ -29,9 +30,9 @@ export const searchVacanciesSchema = z.object({
   destination: z.string().trim().max(120).optional(),
   engagementType: z.enum(['contract', 'commission', 'full_time', 'seasonal']).optional(),
   isRemote: bool,
-  companyProfileId: z.coerce.number().int().positive().optional(),
+  companyProfileId: objectId.optional(),
   page: z.coerce.number().int().min(1).optional(),
   perPage: z.coerce.number().int().min(1).max(50).optional(),
 });
 
-export const idParamSchema = z.object({ id: z.coerce.number().int().positive() });
+export const idParamSchema = z.object({ id: objectId });

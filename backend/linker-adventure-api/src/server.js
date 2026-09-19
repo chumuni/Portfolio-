@@ -5,9 +5,9 @@ import { runMigrations } from './db/migrate.js';
 import { closeDb } from './db/index.js';
 import * as userRepo from './repositories/user.repo.js';
 
-runMigrations();
+await runMigrations();
 
-const purged = userRepo.purgeExpiredRefreshTokens();
+const purged = await userRepo.purgeExpiredRefreshTokens();
 if (purged > 0) logger.info(`Purged ${purged} expired refresh tokens`);
 
 const server = createApp().listen(config.port, () => {
@@ -18,8 +18,8 @@ const server = createApp().listen(config.port, () => {
 
 function shutdown(signal) {
   logger.info(`${signal} received — shutting down`);
-  server.close(() => {
-    closeDb();
+  server.close(async () => {
+    await closeDb();
     process.exit(0);
   });
   // Don't hang forever on a stuck connection.

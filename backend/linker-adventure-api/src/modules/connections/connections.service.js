@@ -8,7 +8,7 @@ import { notFound, forbidden, badRequest, conflict } from '../../utils/AppError.
  * Core product rule: a connection is only "matched" when BOTH sides have
  * expressed interest. One-sided interest stays pending and unlocks nothing.
  */
-function reconcile(connection) {
+async function reconcile(connection) {
   if (connection.status === 'declined' || connection.status === 'archived') return connection;
   if (connection.companyInterested && connection.agentInterested && connection.status !== 'matched') {
     return connectionRepo.markMatched(connection.id);
@@ -16,17 +16,17 @@ function reconcile(connection) {
   return connection;
 }
 
-function ownProfileOf(user) {
+async function ownProfileOf(user) {
   const profile = user.role === 'company'
-    ? profileRepo.findCompanyByUserId(user.id)
-    : profileRepo.findAgentByUserId(user.id);
+    ? await profileRepo.findCompanyByUserId(user.id)
+    : await profileRepo.findAgentByUserId(user.id);
   if (!profile) throw notFound('Set up your profile before connecting with others');
   return profile;
 }
 
 /** Throws unless the user is one of the two parties on this connection. */
-export function assertParticipant(user, connection) {
-  const profile = ownProfileOf(user);
+export async function assertParticipant(user, connection) {
+  const profile = await ownProfileOf(user);
   const isParty = user.role === 'company'
     ? connection.companyProfileId === profile.id
     : connection.agentProfileId === profile.id;
@@ -34,23 +34,23 @@ export function assertParticipant(user, connection) {
   return profile;
 }
 
-export function expressInterest(user, { targetProfileId, note }) {
-  const ownProfile = ownProfileOf(user);
+export async function expressInterest(user, { targetProfileId, note }) {
+  const ownProfile = await ownProfileOf(user);
   const side = user.role;
 
   const companyProfileId = side === 'company' ? ownProfile.id : targetProfileId;
   const agentProfileId = side === 'agent' ? ownProfile.id : targetProfileId;
 
   const counterpart = side === 'company'
-    ? profileRepo.findAgentById(agentProfileId)
-    : profileRepo.findCompanyById(companyProfileId);
+    ? await profileRepo.findAgentById(agentProfileId)
+    : await profileRepo.findCompanyById(companyProfileId);
   if (!counterpart) throw notFound('That profile does not exist');
 
-  const existing = connectionRepo.findPair(companyProfileId, agentProfileId);
+  const existing = await connectionRepo.findPair(companyProfileId, agentProfileId);
 
   if (!existing) {
-    const connection = connectionRepo.create({ companyProfileId, agentProfileId, initiatedBy: side, note });
-    notifyCounterpart(connection, side, 'connection.interest', 'New interest in your profile');
+    const connection = await connectionRepo.create({ companyProfileId, agentProfileId, initiatedBy: side, note });
+    await notifyCounterpart(connection, side, 'connection.interest', 'New interest in your profile');
     return { connection, matched: false };
   }
 
@@ -61,47 +61,47 @@ export function expressInterest(user, { targetProfileId, note }) {
     return { connection: existing, matched: existing.status === 'matched' };
   }
 
-  const updated = reconcile(connectionRepo.setInterest(existing.id, side, true));
+  const updated = await reconcile(await connectionRepo.setInterest(existing.id, side, true));
   const matched = updated.status === 'matched';
 
-  notifyCounterpart(
+  await notifyCounterpart(
     updated,
     side,
     matched ? 'connection.matched' : 'connection.interest',
     matched ? 'You have a new match' : 'New interest in your profile',
   );
-  if (matched) notifySelf(updated, side, 'connection.matched', 'You have a new match');
+  if (matched) await notifySelf(updated, side, 'connection.matched', 'You have a new match');
 
   return { connection: updated, matched };
 }
 
-export function withdrawInterest(user, connectionId) {
-  const connection = getOwnedConnection(user, connectionId);
-  const updated = connectionRepo.setInterest(connection.id, user.role, false);
+export async function withdrawInterest(user, connectionId) {
+  const connection = await getOwnedConnection(user, connectionId);
+  const updated = await connectionRepo.setInterest(connection.id, user.role, false);
   return connectionRepo.setStatus(updated.id, 'pending');
 }
 
-export function decline(user, connectionId) {
-  const connection = getOwnedConnection(user, connectionId);
+export async function decline(user, connectionId) {
+  const connection = await getOwnedConnection(user, connectionId);
   return connectionRepo.setStatus(connection.id, 'declined');
 }
 
-export function archive(user, connectionId) {
-  const connection = getOwnedConnection(user, connectionId);
+export async function archive(user, connectionId) {
+  const connection = await getOwnedConnection(user, connectionId);
   return connectionRepo.setStatus(connection.id, 'archived');
 }
 
-export function getOwnedConnection(user, connectionId) {
-  const connection = connectionRepo.findById(connectionId);
+export async function getOwnedConnection(user, connectionId) {
+  const connection = await connectionRepo.findById(connectionId);
   if (!connection) throw notFound('Connection not found');
-  assertParticipant(user, connection);
+  await assertParticipant(user, connection);
   return connection;
 }
 
-export function list(user, { status, ...paginationInput }) {
-  const profile = ownProfileOf(user);
+export async function list(user, { status, ...paginationInput }) {
+  const profile = await ownProfileOf(user);
   const { page, perPage, offset } = parsePagination(paginationInput);
-  const { items, total } = connectionRepo.listForProfile({
+  const { items, total } = await connectionRepo.listForProfile({
     profileType: user.role,
     profileId: profile.id,
     status,
@@ -121,26 +121,26 @@ export function assertMatched(connection) {
 
 /* ------------------------------ notifications ---------------------------- */
 
-function counterpartUserId(connection, actingSide) {
+async function counterpartUserId(connection, actingSide) {
   const profile = actingSide === 'company'
-    ? profileRepo.findAgentById(connection.agentProfileId)
-    : profileRepo.findCompanyById(connection.companyProfileId);
+    ? await profileRepo.findAgentById(connection.agentProfileId)
+    : await profileRepo.findCompanyById(connection.companyProfileId);
   return profile?.userId ?? null;
 }
 
-function selfUserId(connection, actingSide) {
+async function selfUserId(connection, actingSide) {
   const profile = actingSide === 'company'
-    ? profileRepo.findCompanyById(connection.companyProfileId)
-    : profileRepo.findAgentById(connection.agentProfileId);
+    ? await profileRepo.findCompanyById(connection.companyProfileId)
+    : await profileRepo.findAgentById(connection.agentProfileId);
   return profile?.userId ?? null;
 }
 
-function notifyCounterpart(connection, actingSide, type, title) {
-  const userId = counterpartUserId(connection, actingSide);
-  if (userId) analyticsRepo.createNotification({ userId, type, title, payload: { connectionId: connection.id } });
+async function notifyCounterpart(connection, actingSide, type, title) {
+  const userId = await counterpartUserId(connection, actingSide);
+  if (userId) await analyticsRepo.createNotification({ userId, type, title, payload: { connectionId: connection.id } });
 }
 
-function notifySelf(connection, actingSide, type, title) {
-  const userId = selfUserId(connection, actingSide);
-  if (userId) analyticsRepo.createNotification({ userId, type, title, payload: { connectionId: connection.id } });
+async function notifySelf(connection, actingSide, type, title) {
+  const userId = await selfUserId(connection, actingSide);
+  if (userId) await analyticsRepo.createNotification({ userId, type, title, payload: { connectionId: connection.id } });
 }
